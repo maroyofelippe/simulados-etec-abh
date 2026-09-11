@@ -1,0 +1,27 @@
+<div style="display:flex;justify-content:space-between;align-items:center">
+  <h2 style="margin:0"><%= simulado.titulo %></h2>
+  <div class="cronometro" id="cronometro" role="timer" aria-label="Tempo restante">--:--</div>
+</div>
+<p class="metric-label" id="progresso" aria-live="polite"></p>
+<hr style="border-color:var(--borda)">
+
+<div class="card">
+  <div id="questao-area" aria-live="polite"><p>Carregando questão…</p></div>
+</div>
+
+<div class="metric-label" role="alert" style="margin-top:16px">
+  <b>Atenção:</b> não saia desta aba/janela: cada perda de foco <b>anula a questão exibida</b> e fica registrada.
+  Copiar, colar e selecionar estão bloqueados.
+</div>
+
+<script>
+  window.PROVA_CFG = {
+    provaId: <%= prova.id %>,
+    total: <%= total %>,
+    respondidas: <%= respondidas %>,
+    restante: <%= restante %>,
+    perdas: <%= prova.perdas_foco %>,
+    maxPerdasFoco: <%= maxPerdasFoco %>,
+    palavraCoringa: "<%= palavraCoringa %>"
+  };
+</script>

@@ -1,0 +1,38 @@
+<h1>Meus Alunos</h1>
+<p class="metric-label">Alunos das turmas que você leciona. Use a edição para corrigir turma, período ou dados de quem se cadastrou errado.</p>
+
+<% if (semTurmas) { %>
+  <div class="alerta alerta-aviso">Você ainda não tem turmas atribuídas. Peça à coordenação para vincular suas turmas.</div>
+<% } %>
+
+<div class="card" style="margin-bottom:12px">
+  <input type="search" id="busca" placeholder="Filtrar por nome, RM ou e-mail…" style="width:100%">
+</div>
+
+<div class="tabela-responsiva">
+<table>
+  <thead><tr><th>Nome</th><th>RM</th><th>E-mail</th><th>Turma</th><th>Período</th><th>Ações</th></tr></thead>
+  <tbody>
+  <% alunos.forEach(function (a) { %>
+    <tr class="linha-aluno">
+      <td><%= a.nome %></td>
+      <td><%= a.rm || '—' %></td>
+      <td><%= a.email || '—' %></td>
+      <td><%= a.turma ? a.turma.nome : '—' %></td>
+      <td><%= a.periodo || '—' %></td>
+      <td><a class="btn btn-outline" style="padding:6px 10px" href="/professor/alunos/<%= a.id %>/editar"><i class="fa-solid fa-pen"></i> Editar</a></td>
+    </tr>
+  <% }); %>
+  <% if (!alunos.length) { %><tr><td colspan="6">Nenhum aluno encontrado.</td></tr><% } %>
+  </tbody>
+</table>
+</div>
+
+<script>
+  document.getElementById('busca').addEventListener('input', function (e) {
+    var termo = e.target.value.toLowerCase();
+    document.querySelectorAll('.linha-aluno').forEach(function (tr) {
+      tr.hidden = termo && tr.textContent.toLowerCase().indexOf(termo) === -1;
+    });
+  });
+</script>

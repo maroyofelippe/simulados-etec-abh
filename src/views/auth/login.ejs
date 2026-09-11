@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-tema="claro">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar — Simulados ETEC ABH</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Slab:wght@100;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="/css/tema.css">
+</head>
+<body class="login-page">
+  <!--<img src="/img/logo-cps-2022.svg" alt="Centro Paula Souza" class="logo-oficial">-->
+  <main class="login-card">
+    <div class="card">
+      <div style="text-align:center;margin-bottom:16px">
+        <span class="selo" style="background:var(--vermelho-base);color:#fff;padding:8px 12px;border-radius:8px;font-family:var(--fonte-titulo);font-size:24px">ETEC ABH</span>
+        <h2 style="margin:12px 0 0">Simulados Educacionais</h2>
+        <p class="metric-label">Adhemar Batista Heméritas</p>
+      </div>
+      <% if (typeof aviso !== 'undefined' && aviso) { %><div class="alerta alerta-ok"><%= aviso %></div><% } %>
+      <% if (erro) { %><div class="alerta alerta-erro"><%= erro %></div><% } %>
+      <form method="POST" action="/login">
+        <label><i class="fa-solid fa-user"></i> E-mail ou RM</label>
+        <input name="identificador" required autofocus placeholder="seu.email ou RM">
+        <label><i class="fa-solid fa-lock"></i> Senha</label>
+        <input type="password" name="senha" required>
+        <button class="btn btn-primario" style="width:100%;margin-top:16px;justify-content:center"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+      </form>
+      <p style="text-align:center;margin-top:16px">
+        Ainda não tem conta? <a href="/cadastro">Criar conta</a>
+      </p>
+    </div>
+  </main>
+</body>
+</html>

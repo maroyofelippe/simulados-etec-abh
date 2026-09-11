@@ -1,0 +1,42 @@
+<h1>Turmas</h1>
+<div class="card" style="margin-bottom:16px">
+  <form method="POST" action="/admin/turmas">
+    <div class="grid grid-3">
+      <div><label>Nome (ex.: 1º A)</label><input name="nome" required></div>
+      <div><label>Série</label><input name="serie" placeholder="1ª Série EM"></div>
+      <div><label>Período</label>
+        <select name="periodo"><option>Manhã</option><option>Tarde</option><option>Noite</option><option>Integral</option></select></div>
+      <div><label>Ano letivo</label><input type="number" name="ano_letivo" value="2025"></div>
+      <div><label>Unidade</label>
+        <select name="unidade_id" required>
+          <% unidades.forEach(function(u){ %><option value="<%= u.id %>"><%= u.nome %></option><% }); %>
+        </select></div>
+    </div>
+    <button class="btn btn-primario" style="margin-top:12px">Adicionar turma</button>
+  </form>
+</div>
+<div class="tabela-responsiva">
+<table>
+  <thead><tr><th>Turma</th><th>Série</th><th>Período</th><th>Ano</th><th>Unidade</th><th>Situação</th><th>Dashboard</th><th>Ações</th></tr></thead>
+  <tbody>
+  <% turmas.forEach(function(t){ %>
+    <tr<%= t.ativo ? '' : ' style="opacity:.6"' %>>
+    <td><%= t.nome %></td><td><%= t.serie||'—' %></td><td><%= t.periodo %></td>
+    <td><%= t.ano_letivo %></td><td><%= t.unidade ? t.unidade.nome : '—' %></td>
+    <td><span class="badge mencao-<%= t.ativo ? 'MB' : 'I' %>"><%= t.ativo ? 'Ativa' : 'Inativa' %></span></td>
+    <td><a href="/dashboard/turma/<%= t.id %>">ver</a></td>
+    <td>
+      <% if (typeof usuario !== 'undefined' && usuario && usuario.is_root) { %>
+        <form method="POST" action="/admin/turmas/<%= t.id %>/status"
+              onsubmit="return confirm('<%= t.ativo ? 'Inativar' : 'Reativar' %> a turma <%= t.nome %>? <%= t.ativo ? 'Ela deixará de aparecer nas listas e formulários de seleção (alunos e histórico continuam preservados).' : '' %>');">
+          <button type="submit" class="btn btn-outline" style="padding:6px 10px">
+            <i class="fa-solid fa-<%= t.ativo ? 'ban' : 'rotate-left' %>"></i> <%= t.ativo ? 'Inativar' : 'Reativar' %>
+          </button>
+        </form>
+      <% } else { %>—<% } %>
+    </td>
+    </tr>
+  <% }); %>
+  </tbody>
+</table>
+</div>

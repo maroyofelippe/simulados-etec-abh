@@ -1,0 +1,164 @@
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+  <h1>Captação Ativa — Feira de Profissões</h1>
+  <a class="btn btn-primario" href="/dashboard/feira/exportar"><i class="fa-solid fa-file-arrow-down"></i> Exportar relatório (CSV)</a>
+</div>
+<p class="metric-label">Cadastro público: <a href="/cadastro" target="_blank">/cadastro</a> (tipo de conta "Visitante da Feira de Profissões")</p>
+
+<div class="grid grid-3">
+  <div class="card">
+    <div class="metric"><%= total %></div>
+    <div class="metric-label">Visitantes cadastrados</div>
+  </div>
+  <div class="card">
+    <div class="metric"><%= idadeMedia %></div>
+    <div class="metric-label">Idade média</div>
+  </div>
+  <div class="card">
+    <div class="metric"><%= Object.keys(porCurso).length %></div>
+    <div class="metric-label">Cursos com interesse manifestado</div>
+  </div>
+</div>
+
+<div class="grid grid-2" style="margin-top:16px">
+  <div class="card">
+    <h3>Curso de interesse</h3>
+    <canvas id="grafCurso" height="200"></canvas>
+  </div>
+  <div class="card">
+    <h3>Relação com a ETEC</h3>
+    <canvas id="grafRelacao" height="200"></canvas>
+  </div>
+</div>
+
+<div class="grid grid-2" style="margin-top:16px">
+  <div class="card">
+    <h3>Faixa etária</h3>
+    <canvas id="grafFaixa" height="200"></canvas>
+  </div>
+  <div class="card">
+    <h3>Cadastros por dia</h3>
+    <canvas id="grafDia" height="200"></canvas>
+  </div>
+</div>
+
+<h2 style="margin-top:24px">Desempenho no Simulado</h2>
+<div class="grid grid-3">
+  <div class="card">
+    <div class="metric"><%= taxaConclusao.toFixed(1) %>%</div>
+    <div class="metric-label">Taxa de conclusão (<%= desempenho.provasConcluidas %> de <%= total %>)</div>
+  </div>
+  <div class="card">
+    <div class="metric"><%= desempenho.mediaNota.toFixed(1) %></div>
+    <div class="metric-label">Nota média geral</div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Menções</h3>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <span class="badge mencao-I">I: <%= desempenho.mencoes.I %></span>
+      <span class="badge mencao-R">R: <%= desempenho.mencoes.R %></span>
+      <span class="badge mencao-B">B: <%= desempenho.mencoes.B %></span>
+      <span class="badge mencao-MB">MB: <%= desempenho.mencoes.MB %></span>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h3>Nota média por curso de interesse</h3>
+  <% if (mediaNotaPorCurso.length) { %>
+    <canvas id="grafNotaCurso" height="90"></canvas>
+  <% } else { %>
+    <p class="metric-label">Nenhuma prova concluída ainda.</p>
+  <% } %>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h3>Visitantes</h3>
+  <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr><th>Nome</th><th>Telefone</th><th>E-mail</th><th>Curso de interesse</th><th>Relação</th><th>Cadastrado em</th><th>Simulado</th><th>Nota</th></tr>
+      </thead>
+      <tbody>
+        <% visitantes.forEach(function(v){ %>
+          <tr>
+            <td><%= v.nome %></td>
+            <td><%= v.telefone || '—' %></td>
+            <td><%= v.email || '—' %></td>
+            <td><%= v.curso_interesse || '—' %></td>
+            <td><%= v.relacao_etec || '—' %></td>
+            <td><%= new Date(v.criado_em).toLocaleDateString('pt-BR') %></td>
+            <td>
+              <% if (v.provaStatus === 'concluida') { %><span class="badge mencao-MB">Concluída</span>
+              <% } else if (v.provaStatus === 'em_andamento') { %><span class="badge mencao-R">Em andamento</span>
+              <% } else if (v.provaStatus === 'expirada') { %><span class="badge mencao-I">Expirada</span>
+              <% } else { %><span class="metric-label">Não iniciada</span><% } %>
+            </td>
+            <td>
+              <% if (v.nota !== null) { %><b><%= v.nota.toFixed(1) %></b> <span class="badge mencao-<%= v.mencao %>"><%= v.mencao %></span>
+              <% } else { %>—<% } %>
+            </td>
+          </tr>
+        <% }); %>
+        <% if (!visitantes.length) { %>
+          <tr><td colspan="8" class="metric-label">Nenhum visitante cadastrado ainda.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const porCurso = <%- JSON.stringify(porCurso) %>;
+const porRelacao = <%- JSON.stringify(porRelacao) %>;
+const porFaixaEtaria = <%- JSON.stringify(porFaixaEtaria) %>;
+const porDia = <%- JSON.stringify(porDia) %>;
+const mediaNotaPorCurso = <%- JSON.stringify(mediaNotaPorCurso) %>;
+const cores = ['#00C1CF', '#7A1FA2', '#F2A93B', '#E63946', '#2A9D8F', '#4361EE'];
+
+new Chart(document.getElementById('grafCurso'), {
+  type: 'bar',
+  data: {
+    labels: Object.keys(porCurso),
+    datasets: [{ label: 'Interessados', data: Object.values(porCurso), backgroundColor: cores }]
+  },
+  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+});
+
+new Chart(document.getElementById('grafRelacao'), {
+  type: 'doughnut',
+  data: {
+    labels: Object.keys(porRelacao),
+    datasets: [{ data: Object.values(porRelacao), backgroundColor: cores }]
+  }
+});
+
+new Chart(document.getElementById('grafFaixa'), {
+  type: 'bar',
+  data: {
+    labels: porFaixaEtaria.map(f => f.faixa),
+    datasets: [{ label: 'Visitantes', data: porFaixaEtaria.map(f => f.total), backgroundColor: '#00C1CF' }]
+  },
+  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+});
+
+new Chart(document.getElementById('grafDia'), {
+  type: 'line',
+  data: {
+    labels: porDia.map(d => d.dia),
+    datasets: [{ label: 'Cadastros', data: porDia.map(d => d.total), borderColor: '#00C1CF', backgroundColor: 'rgba(0,193,207,.15)', tension: .3, fill: true }]
+  },
+  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+});
+
+if (mediaNotaPorCurso.length) {
+  new Chart(document.getElementById('grafNotaCurso'), {
+    type: 'bar',
+    data: {
+      labels: mediaNotaPorCurso.map(c => c.curso + ' (' + c.total + ')'),
+      datasets: [{ label: 'Nota média', data: mediaNotaPorCurso.map(c => c.media), backgroundColor: cores }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 10 } } }
+  });
+}
+</script>

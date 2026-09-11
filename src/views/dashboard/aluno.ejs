@@ -1,0 +1,106 @@
+<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:12px">
+  <div>
+    <h1><%= aluno.nome %></h1>
+    <p class="metric-label">Turma: <%= aluno.turma ? aluno.turma.nome : '—' %> • RM: <%= aluno.rm || '—' %></p>
+  </div>
+  <form method="GET" style="display:flex;gap:16px;align-items:start;flex-wrap:wrap">
+    <div><label>Período</label>
+      <select name="periodo" onchange="this.form.submit()">
+        <% ['todos','semana','mes','ano'].forEach(function(p){ %>
+          <option value="<%= p %>" <%= periodo===p?'selected':'' %>><%= {todos:'Todos',semana:'Semanal',mes:'Mensal',ano:'Anual'}[p] %></option>
+        <% }); %>
+      </select></div>
+    <% if (disciplinas.length) { %>
+    <div>
+      <label>Disciplinas (selecione uma ou mais)</label>
+      <div style="display:flex;flex-direction:column;gap:4px;max-height:150px;overflow-y:auto;border:1px solid var(--borda);border-radius:8px;padding:8px;min-width:220px;background:var(--bg-superficie)">
+        <% disciplinas.forEach(function(d){ %>
+          <label style="display:flex;align-items:center;gap:8px;margin:0;font-weight:400">
+            <input type="checkbox" name="disciplina_id" value="<%= d.id %>" style="width:auto" onchange="this.form.submit()" <%= disciplinaIds.includes(d.id) ? 'checked' : '' %>>
+            <%= d.nome %>
+          </label>
+        <% }); %>
+      </div>
+    </div>
+    <% } %>
+  </form>
+</div>
+<div class="card" style="margin-top:12px">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <h3>Evolução de notas</h3>
+    <div style="display:flex;gap:6px">
+      <button type="button" class="btn btn-outline ativo" id="btnLinha" style="padding:6px 10px" onclick="mudarTipo('line')"><i class="fa-solid fa-chart-line"></i> Linha</button>
+      <button type="button" class="btn btn-outline" id="btnBarra" style="padding:6px 10px" onclick="mudarTipo('bar')"><i class="fa-solid fa-chart-column"></i> Barra</button>
+    </div>
+  </div>
+  <canvas id="graf" height="90"></canvas>
+  <p class="metric-label" id="dicaLinha"></p>
+</div>
+<div class="tabela-responsiva">
+<table style="margin-top:16px">
+  <thead><tr><th>Simulado</th><th>Disciplina</th><th>Data</th><th>Nota</th><th>Menção</th><th>Perdas foco</th></tr></thead>
+  <tbody>
+  <% evolucao.forEach(function(e){ %>
+    <tr><td><%= e.titulo %></td><td><%= e.disciplinaNome %></td><td><%= new Date(e.data).toLocaleDateString('pt-BR') %></td>
+    <td><%= e.nota.toFixed(1) %></td><td><span class="badge mencao-<%= e.mencao %>"><%= e.mencao %></span></td>
+    <td><%= e.foco %></td></tr>
+  <% }); %>
+  </tbody>
+</table>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const ev = <%- JSON.stringify(evolucao) %>;
+const cores = ['#B20000','#005C6D','#A0C340','#8A29E6','#FFC24C','#4C7EFF','#FF4CA2','#00C1CF'];
+const disciplinasPresentes = Array.from(new Set(ev.map(e => e.disciplinaNome)));
+
+// Com mais de uma disciplina presente, o modo Linha plota cada uma como uma série separada
+function datasetsPorDisciplina() {
+  const datas = Array.from(new Set(ev.map(e => e.data))).sort((a, b) => new Date(a) - new Date(b));
+  return {
+    labels: datas.map(d => new Date(d).toLocaleDateString('pt-BR')),
+    datasets: disciplinasPresentes.map((nome, i) => ({
+      label: nome,
+      data: datas.map(d => {
+        const achado = ev.find(e => e.data === d && e.disciplinaNome === nome);
+        return achado ? achado.nota : null;
+      }),
+      borderColor: cores[i % cores.length],
+      backgroundColor: cores[i % cores.length],
+      tension: .3, fill: false, spanGaps: true
+    }))
+  };
+}
+
+let graf;
+function desenhar(tipo) {
+  if (graf) graf.destroy();
+  const separarPorDisciplina = tipo === 'line' && disciplinasPresentes.length > 1;
+  let labels, datasets;
+  if (separarPorDisciplina) {
+    ({ labels, datasets } = datasetsPorDisciplina());
+  } else {
+    labels = ev.map(e => e.titulo);
+    datasets = [{
+      label: 'Nota', data: ev.map(e => e.nota),
+      borderColor: '#B20000',
+      backgroundColor: tipo === 'bar' ? '#B20000' : 'rgba(178,0,0,.15)',
+      tension: .3, fill: tipo === 'line'
+    }];
+  }
+  graf = new Chart(document.getElementById('graf'), {
+    type: tipo,
+    data: { labels, datasets },
+    options: { scales: { y: { min: 0, max: 10 } }, plugins: { legend: { display: datasets.length > 1 } } }
+  });
+  document.getElementById('dicaLinha').textContent = separarPorDisciplina
+    ? 'Exibindo uma linha por disciplina. Use os filtros ao lado para restringir a comparação.'
+    : '';
+}
+function mudarTipo(tipo) {
+  desenhar(tipo);
+  document.getElementById('btnLinha').classList.toggle('ativo', tipo === 'line');
+  document.getElementById('btnBarra').classList.toggle('ativo', tipo === 'bar');
+}
+desenhar('line');
+</script>

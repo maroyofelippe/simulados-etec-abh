@@ -1,0 +1,31 @@
+<div style="display:flex;justify-content:space-between;align-items:center">
+  <h1>Simulados</h1>
+  <a class="btn btn-primario" href="/professor/simulados/novo"><i class="fa-solid fa-plus"></i> Novo Simulado</a>
+</div>
+<div class="tabela-responsiva">
+<table>
+  <thead><tr><th>Título</th><th>Tipo</th><th>Disciplina</th><th>Turma</th><th>Questões</th><th>Status</th><th>Ações</th></tr></thead>
+  <tbody>
+  <% simulados.forEach(function(s){ %>
+    <tr>
+      <td><%= s.titulo %></td>
+      <td><%= s.tipo === 'geral' ? 'Geral' : 'Aleatório/aluno' %></td>
+      <td><%= s.disciplina ? s.disciplina.nome : '—' %></td>
+      <td><%= s.turma ? s.turma.nome : '—' %></td>
+      <td><%= s.qtd_questoes %></td>
+      <td><span class="badge <%= s.publicado ? 'mencao-MB' : 'mencao-R' %>"><%= s.publicado ? 'Publicado' : 'Rascunho' %></span></td>
+      <td style="white-space:nowrap">
+        <a class="btn btn-outline" style="padding:6px 10px" href="/professor/simulados/<%= s.id %>/editar" title="Editar"><i class="fa-solid fa-pen"></i></a>
+        <button class="btn btn-outline" style="padding:6px 10px" onclick="pub(<%= s.id %>)" title="<%= s.publicado ? 'Despublicar' : 'Publicar' %>"><i class="fa-solid <%= s.publicado ? 'fa-eye-slash' : 'fa-upload' %>"></i></button>
+      </td>
+    </tr>
+  <% }); %>
+  </tbody>
+</table>
+</div>
+<script>
+async function pub(id){
+  const r = await fetch('/professor/simulados/'+id+'/publicar',{method:'POST'});
+  const d = await r.json(); if(!r.ok){alert(d.erro);return;} location.reload();
+}
+</script>

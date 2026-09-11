@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-tema="claro">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar conta — Simulados ETEC ABH</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Slab:wght@100;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="/css/tema.css">
+</head>
+<body class="login-page">
+  <main class="login-card">
+    <div class="card">
+      <div style="text-align:center;margin-bottom:16px">
+        <span class="selo" style="background:var(--vermelho-base);color:#fff;padding:8px 12px;border-radius:8px;font-family:var(--fonte-titulo);font-size:24px">ETEC ABH</span>
+        <h2 style="margin:12px 0 0">Criar conta</h2>
+        <p class="metric-label">Simulados Educacionais — Adhemar Batista Heméritas</p>
+      </div>
+
+      <% if (erro) { %><div class="alerta alerta-erro"><%= erro %></div><% } %>
+
+      <form method="POST" action="/cadastro">
+        <label><i class="fa-solid fa-id-badge"></i> Tipo de conta</label>
+        <select name="perfil" id="perfil" required>
+          <option value="aluno"           <%= dados.perfil === 'professor' || dados.perfil === 'visitante_feira' ? '' : 'selected' %>>Aluno(a)</option>
+          <option value="professor"       <%= dados.perfil === 'professor' ? 'selected' : '' %>>Professor(a)</option>
+          <option value="visitante_feira" <%= dados.perfil === 'visitante_feira' ? 'selected' : '' %>>Visitante da Feira de Profissões</option>
+        </select>
+
+        <label><i class="fa-solid fa-user"></i> Nome completo</label>
+        <input name="nome" required value="<%= dados.nome || '' %>">
+
+        <label><i class="fa-solid fa-envelope"></i> E-mail</label>
+        <input type="email" name="email" required value="<%= dados.email || '' %>">
+
+        <div id="campos-unidade">
+          <label><i class="fa-solid fa-school"></i> Unidade</label>
+          <select name="unidade_id" id="unidade_id">
+            <option value="">Selecione…</option>
+            <% unidades.forEach(function(u){ %>
+              <option value="<%= u.id %>" <%= String(dados.unidade_id) === String(u.id) ? 'selected' : '' %>><%= u.nome %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <div id="campos-aluno">
+          <label><i class="fa-solid fa-hashtag"></i> RM (Registro de Matrícula)</label>
+          <input name="rm" value="<%= dados.rm || '' %>">
+
+          <label><i class="fa-solid fa-chalkboard-user"></i> Turma</label>
+          <select name="turma_id" id="turma_id">
+            <option value="">Selecione…</option>
+            <% turmas.forEach(function(t){ %>
+              <option value="<%= t.id %>" data-unidade="<%= t.unidade_id %>" <%= String(dados.turma_id) === String(t.id) ? 'selected' : '' %>>
+                <%= t.nome %><%= t.serie ? ' — ' + t.serie : '' %> (<%= t.periodo %>)
+              </option>
+            <% }); %>
+          </select>
+          <p class="metric-label">Escolheu a turma errada? Depois do cadastro, apenas o professor da turma ou a coordenação pode corrigir.</p>
+        </div>
+
+        <div id="campos-visitante">
+          <label><i class="fa-solid fa-phone"></i> Telefone</label>
+          <input name="telefone" placeholder="(11) 91234-5678" value="<%= dados.telefone || '' %>">
+
+          <label><i class="fa-solid fa-cake-candles"></i> Data de nascimento</label>
+          <input type="date" name="data_nascimento" value="<%= dados.data_nascimento || '' %>">
+
+          <label><i class="fa-solid fa-people-arrows"></i> Relação com a ETEC</label>
+          <select name="relacao_etec">
+            <option value="">Selecione…</option>
+            <%
+              const rotulosRelacao = { ex_aluno: 'Ex-aluno(a)', candidato: 'Candidato(a)', responsavel: 'Responsável', aluno: 'Aluno(a)' };
+            %>
+            <% relacoesVisitante.forEach(function(r){ %>
+              <option value="<%= r %>" <%= dados.relacao_etec === r ? 'selected' : '' %>><%= rotulosRelacao[r] %></option>
+            <% }); %>
+          </select>
+
+          <label><i class="fa-solid fa-graduation-cap"></i> Curso de interesse</label>
+          <select name="curso_interesse">
+            <option value="">Selecione…</option>
+            <% cursosVisitante.forEach(function(c){ %>
+              <option value="<%= c %>" <%= dados.curso_interesse === c ? 'selected' : '' %>><%= c %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <div id="campos-codigo">
+          <label><i class="fa-solid fa-key"></i> Código de acesso</label>
+          <input name="codigo_convite" value="<%= dados.codigo_convite || '' %>" placeholder="Fornecido pela escola">
+        </div>
+
+        <div id="campos-senha">
+          <label><i class="fa-solid fa-lock"></i> Senha (mín. 6 caracteres)</label>
+          <input type="password" name="senha" minlength="6">
+
+          <label><i class="fa-solid fa-lock"></i> Confirmar senha</label>
+          <input type="password" name="confirmar_senha" minlength="6">
+        </div>
+
+        <p id="aviso-professor" class="metric-label" hidden>
+          <i class="fa-solid fa-circle-info"></i> Contas de professor ficam inativas até a validação do administrador.
+        </p>
+
+        <button class="btn btn-primario" style="width:100%;margin-top:16px;justify-content:center"><i class="fa-solid fa-user-plus"></i> Cadastrar</button>
+      </form>
+
+      <p style="text-align:center;margin-top:16px">
+        Já tem conta? <a href="/login">Entrar</a>
+      </p>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var perfil = document.getElementById('perfil');
+      var camposAluno = document.getElementById('campos-aluno');
+      var camposVisitante = document.getElementById('campos-visitante');
+      var camposUnidade = document.getElementById('campos-unidade');
+      var camposCodigo = document.getElementById('campos-codigo');
+      var camposSenha = document.getElementById('campos-senha');
+      var avisoProf = document.getElementById('aviso-professor');
+      var rm = document.querySelector('[name="rm"]');
+      var turma = document.getElementById('turma_id');
+      var unidade = document.getElementById('unidade_id');
+      var codigoConvite = document.querySelector('[name="codigo_convite"]');
+      var senha = document.querySelector('[name="senha"]');
+      var confirmarSenha = document.querySelector('[name="confirmar_senha"]');
+      var telefone = document.querySelector('[name="telefone"]');
+      var dataNascimento = document.querySelector('[name="data_nascimento"]');
+      var relacaoEtec = document.querySelector('[name="relacao_etec"]');
+      var cursoInteresse = document.querySelector('[name="curso_interesse"]');
+
+      function aplicarPerfil() {
+        var ehAluno = perfil.value === 'aluno';
+        var ehProfessor = perfil.value === 'professor';
+        var ehVisitante = perfil.value === 'visitante_feira';
+
+        camposAluno.hidden = !ehAluno;
+        rm.required = ehAluno;
+        turma.required = ehAluno;
+
+        camposUnidade.hidden = ehVisitante;
+        unidade.required = !ehVisitante;
+
+        camposCodigo.hidden = ehVisitante;
+        codigoConvite.required = !ehVisitante;
+
+        camposSenha.hidden = ehVisitante;
+        senha.required = !ehVisitante;
+        confirmarSenha.required = !ehVisitante;
+
+        camposVisitante.hidden = !ehVisitante;
+        telefone.required = ehVisitante;
+        dataNascimento.required = ehVisitante;
+        relacaoEtec.required = ehVisitante;
+        cursoInteresse.required = ehVisitante;
+
+        avisoProf.hidden = !ehProfessor;
+      }
+
+      function filtrarTurmas() {
+        var uid = unidade.value;
+        Array.prototype.forEach.call(turma.options, function (opt) {
+          if (!opt.value) return;
+          var ok = !uid || opt.getAttribute('data-unidade') === uid;
+          opt.hidden = !ok;
+          if (!ok && opt.selected) turma.value = '';
+        });
+      }
+
+      perfil.addEventListener('change', aplicarPerfil);
+      unidade.addEventListener('change', filtrarTurmas);
+      aplicarPerfil();
+      filtrarTurmas();
+    })();
+  </script>
+  <!--<%- include('../partials/footer') %>-->
+</body>
+</html>

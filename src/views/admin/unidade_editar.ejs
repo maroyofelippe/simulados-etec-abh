@@ -1,0 +1,26 @@
+<h1>Editar Unidade</h1>
+<div class="card">
+  <form method="POST" action="/admin/unidades/<%= unidadeEditada.id %>" enctype="multipart/form-data">
+    <div class="grid grid-3">
+      <div><label>Nome</label><input name="nome" value="<%= unidadeEditada.nome %>" required></div>
+      <div><label>Sigla</label><input name="sigla" value="<%= unidadeEditada.sigla || '' %>"></div>
+      <div><label>Cidade</label><input name="cidade" value="<%= unidadeEditada.cidade || '' %>"></div>
+    </div>
+    <div class="grid grid-2">
+      <div><label>Código de acesso — Alunos</label>
+        <input name="codigo_aluno" value="<%= unidadeEditada.codigo_aluno || '' %>" placeholder="deixe vazio p/ desabilitar auto-cadastro"></div>
+      <div><label>Código de acesso — Professores</label>
+        <input name="codigo_professor" value="<%= unidadeEditada.codigo_professor || '' %>" placeholder="deixe vazio p/ desabilitar auto-cadastro"></div>
+    </div>
+    <p class="metric-label">Esses códigos são exigidos na tela de auto-cadastro (<code>/cadastro</code>). Compartilhe-os apenas com quem deve criar conta.</p>
+
+    <label>Logo (usado no espelho/PDF da prova)</label>
+    <% if (unidadeEditada.logo_path) { %>
+      <div style="margin-bottom:8px"><img src="/<%= unidadeEditada.logo_path %>" style="height:48px"></div>
+    <% } %>
+    <input type="file" name="logo" accept="image/*">
+    <p class="metric-label">Envie um novo arquivo apenas se quiser substituir o logo atual.</p>
+    <button class="btn btn-primario" style="margin-top:12px"><i class="fa-solid fa-floppy-disk"></i> Salvar alterações</button>
+    <a class="btn btn-outline" style="margin-top:12px" href="/admin/unidades"><i class="fa-solid fa-arrow-left"></i> Cancelar</a>
+  </form>
+</div>

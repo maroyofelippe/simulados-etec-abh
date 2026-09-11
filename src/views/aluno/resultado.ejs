@@ -1,0 +1,59 @@
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px">
+    <div>
+      <% if (unidade && unidade.logo_path) { %>
+        <img src="/<%= unidade.logo_path %>" alt="Logotipo <%= unidade.nome %>" style="height:56px">
+      <% } %>
+      <h2 style="margin:58px 0 0"><%= unidade ? unidade.nome : 'ETEC ABH' %></h2>
+      <p class="metric-label">Espelho da Prova / Simulado</p>
+    </div>
+    <a class="btn btn-primario" href="/aluno/provas/<%= prova.id %>/pdf">⬇ Baixar PDF (assinatura)</a>
+  </div>
+  <hr style="border-color:var(--borda)">
+  <p><b>Aluno:</b> <%= aluno.nome %> — <b>RM:</b> <%= aluno.rm || '-' %> —
+     <b>Turma:</b> <%= aluno.turma ? aluno.turma.nome : '-' %>
+     (<%= aluno.turma ? aluno.turma.ano_letivo : '-' %>)</p>
+  <p><b>Simulado:</b> <%= simulado.titulo %> —
+     <b>Realizada em:</b> <%= prova.finalizada_em ? new Date(prova.finalizada_em).toLocaleString('pt-BR') : '-' %></p>
+  <p><b>Saídas de foco:</b> <%= prova.perdas_foco %></p>
+
+  <% if (resultado) { %>
+  <div style="display:flex;gap:24px;align-items:center;margin-top:8px">
+    <div><div class="metric"><%= Number(resultado.nota).toFixed(1) %></div><div class="metric-label">Nota</div></div>
+    <div><span class="badge mencao-<%= resultado.mencao %>" style="font-size:20px">
+      <%= resultado.mencao %></span>
+      <div class="metric-label"><%= descricaoMencao(resultado.mencao) %></div></div>
+    <div><div class="metric"><%= resultado.acertos %>/<%= resultado.total_questoes %></div><div class="metric-label">Acertos</div></div>
+  </div>
+  <% } %>
+</div>
+
+<h3 id="titulo-gabarito">Gabarito e suas respostas</h3>
+<div class="tabela-responsiva" role="region" aria-labelledby="titulo-gabarito" tabindex="0">
+<table>
+  <caption class="sr-only">Comparação entre a resposta marcada pelo aluno e o gabarito oficial de cada questão</caption>
+  <thead><tr><th scope="col">#</th><th scope="col">Enunciado</th><th scope="col">Sua resposta</th><th scope="col">Correta</th><th scope="col">Situação</th></tr></thead>
+  <tbody>
+  <% let ultimoTextoApoioId = null; %>
+  <% itens.forEach(function(it){ %>
+    <% if (it.texto_apoio && it.texto_apoio_id !== ultimoTextoApoioId) { %>
+      <tr><td colspan="5" style="background:var(--bg-superficie)">
+        <b><%= it.texto_apoio.titulo || 'Texto de apoio' %>:</b> <%= it.texto_apoio.conteudo %>
+      </td></tr>
+      <% ultimoTextoApoioId = it.texto_apoio_id; %>
+    <% } %>
+    <tr>
+      <td><%= it.ordem %></td>
+      <td><%= it.enunciado.length > 90 ? it.enunciado.slice(0,90)+'…' : it.enunciado %></td>
+      <td><b><%= it.letra_marcada || '—' %></b></td>
+      <td><%= it.gabarito %></td>
+      <td>
+        <% if (it.anulada) { %><span class="badge mencao-I">Anulada (foco)</span>
+        <% } else if (it.correta) { %><span class="badge mencao-MB">Acertou</span>
+        <% } else { %><span class="badge mencao-I">Errou</span><% } %>
+      </td>
+    </tr>
+  <% }); %>
+  </tbody>
+</table>
+</div>

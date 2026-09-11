@@ -1,0 +1,41 @@
+<h1>Editar Simulado</h1>
+<div class="card">
+<form method="POST" action="/professor/simulados/<%= simulado.id %>">
+  <label>Título</label><input name="titulo" value="<%= simulado.titulo %>" required>
+  <div class="grid grid-2">
+    <div><label>Tipo</label>
+      <select name="tipo">
+        <option value="aleatorio_aluno" <%= simulado.tipo === 'aleatorio_aluno' ? 'selected' : '' %>>Aleatório por aluno (prova individual)</option>
+        <option value="geral" <%= simulado.tipo === 'geral' ? 'selected' : '' %>>Simulado geral (mesma prova por turma)</option>
+      </select></div>
+    <div><label>Turma de aplicação</label>
+      <select name="turma_id"><option value="">— Todas —</option>
+        <% turmas.forEach(function (t) { %>
+          <option value="<%= t.id %>" <%= simulado.turma_id === t.id ? 'selected' : '' %>><%= t.nome %><%= t.ativo ? '' : ' (inativa)' %></option>
+        <% }); %>
+      </select></div>
+  </div>
+  <div class="grid grid-2">
+    <div><label>Disciplina</label>
+      <select name="disciplina_id"><option value="">— Qualquer —</option>
+        <% disciplinas.forEach(function (d) { %>
+          <option value="<%= d.id %>" <%= simulado.disciplina_id === d.id ? 'selected' : '' %>><%= d.nome %></option>
+        <% }); %>
+      </select></div>
+    <div><label>Tema (opcional)</label><input name="tema" value="<%= simulado.tema || '' %>" placeholder="ex.: Interpretação de texto"></div>
+  </div>
+  <div class="grid grid-4">
+    <div><label>Qtd. questões (máx 20)</label><input type="number" name="qtd_questoes" value="<%= simulado.qtd_questoes %>" min="1" max="20"></div>
+    <div><label>Fáceis</label><input type="number" name="dificuldade_facil" value="<%= simulado.distribuicao_dificuldade ? (simulado.distribuicao_dificuldade['Fácil'] || 0) : 0 %>" min="0"></div>
+    <div><label>Médias</label><input type="number" name="dificuldade_medio" value="<%= simulado.distribuicao_dificuldade ? (simulado.distribuicao_dificuldade['Médio'] || 0) : 0 %>" min="0"></div>
+    <div><label>Difíceis</label><input type="number" name="dificuldade_dificil" value="<%= simulado.distribuicao_dificuldade ? (simulado.distribuicao_dificuldade['Difícil'] || 0) : 0 %>" min="0"></div>
+  </div>
+  <div class="grid grid-2">
+    <div><label>Duração (minutos)</label><input type="number" name="duracao_minutos" value="<%= simulado.duracao_minutos %>" min="5"></div>
+    <div><label>Máx. saídas de foco (0 = anula por questão)</label><input type="number" name="max_perdas_foco" value="<%= simulado.max_perdas_foco %>" min="0"></div>
+  </div>
+  <p class="metric-label">Deixe a distribuição por dificuldade em 0 para sorteio livre. A soma respeita o limite de 20.</p>
+  <button class="btn btn-primario" style="margin-top:12px"><i class="fa-solid fa-floppy-disk"></i> Salvar alterações</button>
+  <a class="btn btn-outline" style="margin-top:12px" href="/professor/simulados"><i class="fa-solid fa-arrow-left"></i> Cancelar</a>
+</form>
+</div>

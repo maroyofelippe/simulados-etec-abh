@@ -1,0 +1,68 @@
+<div style="display:flex;justify-content:space-between;align-items:center">
+  <h1>Banco de Questões</h1>
+  <div style="display:flex;gap:8px">
+    <a class="btn btn-outline" href="/professor/questoes/nova">+ Nova questão</a>
+    <!--<button class="btn btn-primario" disabled onclick="document.getElementById('imp').style.display='block'">Importar CSV</button>-->
+  </div>
+</div>
+
+<div class="card" style="margin:16px 0">
+  <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+    <div><div class="metric"><%= totalQuestoes %></div><div class="metric-label">Questões no banco</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <% placarDisciplinas.forEach(function(p){ %>
+        <span class="badge" style="background:var(--bg-superficie);border:1px solid var(--borda)"><%= p.nome %>: <b><%= p.total %></b></span>
+      <% }); %>
+    </div>
+  </div>
+</div>
+
+<div id="imp" class="card" style="display:none;margin-bottom:16px">
+  <h3>Importar questões (CSV)</h3>
+  <p class="metric-label">Colunas: disciplina,dificuldade,tema,serie,enunciado,alt_a,alt_b,alt_c,alt_d,alt_e,gabarito,texto_apoio_titulo,texto_apoio_conteudo</p>
+  <p class="metric-label">As duas últimas colunas são opcionais (comum em Humanas). Repita o mesmo texto_apoio_titulo em várias linhas para vinculá-las ao mesmo texto de apoio.</p>
+  <input type="file" id="arq" accept=".csv">
+  <button class="btn btn-primario" onclick="importar()">Enviar</button>
+  <pre id="rel" class="metric-label"></pre>
+</div>
+
+<form method="GET" style="display:flex;gap:8px;align-items:end;margin-bottom:12px">
+  <div><label>Disciplina</label>
+    <select name="disciplina_id"><option value="">Todas</option>
+      <% disciplinas.forEach(function(d){ %><option value="<%= d.id %>" <%= String(filtro.disciplina_id)===String(d.id)?'selected':'' %>><%= d.nome %></option><% }); %>
+    </select></div>
+  <div><label>Dificuldade</label>
+    <select name="dificuldade"><option value="">Todas</option>
+      <% ['Fácil','Médio','Difícil'].forEach(function(x){ %><option <%= filtro.dificuldade===x?'selected':'' %>><%= x %></option><% }); %>
+    </select></div>
+  <button class="btn btn-outline">Filtrar</button>
+</form>
+
+<div class="tabela-responsiva">
+<table>
+  <thead><tr><th>Disciplina</th><th>Tema</th><th>Dificuldade</th><th>Enunciado</th><th>Texto de apoio</th><th>Gab.</th></tr></thead>
+  <tbody>
+  <% questoes.forEach(function(q){ %>
+    <tr>
+      <td><%= q.disciplina ? q.disciplina.nome : '—' %></td>
+      <td><%= q.tema || '—' %></td>
+      <td><%= q.dificuldade %></td>
+      <td><%= q.enunciado.length>80 ? q.enunciado.slice(0,80)+'…' : q.enunciado %></td>
+      <td><%= q.textoApoio ? (q.textoApoio.titulo || ('Texto #' + q.textoApoio.id)) : '—' %></td>
+      <td><b><%= q.gabarito %></b></td>
+    </tr>
+  <% }); %>
+  </tbody>
+</table>
+</div>
+<script>
+async function importar(){
+  const f = document.getElementById('arq').files[0];
+  if(!f){alert('Selecione um CSV');return;}
+  const fd = new FormData(); fd.append('arquivo', f);
+  const r = await fetch('/professor/questoes/importar',{method:'POST',body:fd});
+  const d = await r.json();
+  document.getElementById('rel').textContent = JSON.stringify(d,null,2);
+  if(r.ok) setTimeout(()=>location.reload(),1500);
+}
+</script>

@@ -1,0 +1,46 @@
+<div style="display:flex;justify-content:space-between;align-items:center">
+  <h1>Usuários</h1>
+  <div style="display:flex;gap:8px">
+    <a class="btn btn-outline" href="/admin/aprovacoes">
+      <i class="fa-solid fa-user-check"></i> Aprovações<% if (pendentes) { %> <span class="selo" style="background:var(--vermelho-base);color:#fff;padding:1px 7px;border-radius:10px"><%= pendentes %></span><% } %>
+    </a>
+    <a class="btn btn-primario" href="/admin/importar-usuarios"><i class="fa-solid fa-file-import"></i> Importar via CSV</a>
+  </div>
+</div>
+<div class="tabela-responsiva">
+<table>
+  <thead><tr><th>Nome</th><th>Perfil</th><th>Situação</th><th>RM</th><th>Turma</th><th>Último login</th><th>Tempo logado</th><th>Ações</th></tr></thead>
+  <tbody>
+  <% usuarios.forEach(function(u){ %>
+    <tr>
+      <td><%= u.nome %><%- u.is_root ? ' <i class="fa-solid fa-key" title="root"></i>' : '' %></td>
+      <td><%= u.perfil %></td>
+      <td>
+        <% if (!u.ativo && u.status_cadastro === 'auto_pendente') { %><span style="color:var(--andamento)">pendente</span>
+        <% } else if (u.status_cadastro === 'recusado') { %><span style="color:var(--cancelado)">recusado</span>
+        <% } else if (!u.ativo) { %><span style="color:var(--cancelado)">inativo</span>
+        <% } else { %><span style="color:var(--concluido)">ativo</span><% } %>
+      </td>
+      <td><%= u.rm || '—' %></td>
+      <td><%= u.turma ? u.turma.nome : '—' %></td>
+      <td><%= u.ultimo_login ? new Date(u.ultimo_login).toLocaleString('pt-BR') : '—' %></td>
+      <td><%= Math.floor((u.tempo_logado_total||0)/60) %> min</td>
+      <td style="white-space:nowrap">
+        <a class="btn btn-outline" style="padding:6px 10px" href="/admin/usuarios/<%= u.id %>/editar" title="Editar"><i class="fa-solid fa-pen"></i></a>
+        <button class="btn btn-outline" style="padding:6px 10px" title="Resetar senha" onclick="resetarSenha(<%= u.id %>)"><i class="fa-solid fa-key"></i></button>
+        <% if(u.perfil==='aluno'){ %><a class="btn btn-outline" style="padding:6px 10px" href="/dashboard/aluno/<%= u.id %>" title="Desempenho"><i class="fa-solid fa-chart-line"></i></a><% } %>
+      </td>
+    </tr>
+  <% }); %>
+  </tbody>
+</table>
+</div>
+<script>
+async function resetarSenha(id) {
+  if (!confirm('Redefinir a senha deste usuário para a senha padrão institucional?')) return;
+  const r = await fetch('/admin/usuarios/' + id + '/resetar-senha', { method: 'POST' });
+  const d = await r.json();
+  if (!r.ok) { alert(d.erro); return; }
+  alert(d.mensagem + '\nSenha padrão: ' + d.senha_padrao);
+}
+</script>

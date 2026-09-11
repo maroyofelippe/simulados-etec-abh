@@ -1,0 +1,43 @@
+<h1>Unidades de Ensino</h1>
+<div class="card" style="margin-bottom:16px">
+  <h3>Nova unidade (com logo)</h3>
+  <form method="POST" action="/admin/unidades" enctype="multipart/form-data">
+    <div class="grid grid-3">
+      <div><label>Nome</label><input name="nome" required></div>
+      <div><label>Sigla</label><input name="sigla"></div>
+      <div><label>Cidade</label><input name="cidade"></div>
+    </div>
+    <div class="grid grid-2">
+      <div><label>Código de acesso — Alunos</label><input name="codigo_aluno" placeholder="opcional"></div>
+      <div><label>Código de acesso — Professores</label><input name="codigo_professor" placeholder="opcional"></div>
+    </div>
+    <label>Logo (usado no espelho/PDF da prova)</label>
+    <input type="file" name="logo" accept="image/*">
+    <button class="btn btn-primario" style="margin-top:12px"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+  </form>
+</div>
+<div class="tabela-responsiva">
+<table>
+  <thead><tr><th>Logo</th><th>Nome</th><th>Sigla</th><th>Cidade</th><th>Situação</th><th>Ações</th></tr></thead>
+  <tbody>
+  <% unidades.forEach(function(u){ %>
+    <tr<%= u.ativo ? '' : ' style="opacity:.6"' %>>
+      <td><% if(u.logo_path){ %><img src="/<%= u.logo_path %>" style="height:32px"><% }else{ %>—<% } %></td>
+      <td><%= u.nome %></td><td><%= u.sigla || '—' %></td><td><%= u.cidade || '—' %></td>
+      <td><span class="badge mencao-<%= u.ativo ? 'MB' : 'I' %>"><%= u.ativo ? 'Ativa' : 'Inativa' %></span></td>
+      <td style="display:flex;gap:8px">
+        <a class="btn btn-outline" style="padding:6px 10px" href="/admin/unidades/<%= u.id %>/editar" title="Editar"><i class="fa-solid fa-pen"></i></a>
+        <% if (typeof usuario !== 'undefined' && usuario && usuario.is_root) { %>
+          <form method="POST" action="/admin/unidades/<%= u.id %>/status"
+                onsubmit="return confirm('<%= u.ativo ? 'Inativar' : 'Reativar' %> a unidade <%= u.nome %>? <%= u.ativo ? 'Ela e suas turmas deixarão de aparecer nas listas e formulários de seleção (registros e histórico continuam preservados).' : '' %>');">
+            <button type="submit" class="btn btn-outline" style="padding:6px 10px" title="<%= u.ativo ? 'Inativar' : 'Reativar' %>">
+              <i class="fa-solid fa-<%= u.ativo ? 'ban' : 'rotate-left' %>"></i>
+            </button>
+          </form>
+        <% } %>
+      </td>
+    </tr>
+  <% }); %>
+  </tbody>
+</table>
+</div>

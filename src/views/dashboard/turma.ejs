@@ -1,0 +1,70 @@
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+  <h1><%= turma.nome %> — <%= turma.unidade ? turma.unidade.nome : '' %></h1>
+  <form method="GET" style="display:flex;gap:8px;align-items:end;flex-wrap:wrap">
+    <div><label>Período</label>
+      <select name="periodo" onchange="this.form.submit()">
+        <% ['todos','semana','mes','ano'].forEach(function(p){ %>
+          <option value="<%= p %>" <%= periodo===p?'selected':'' %>><%= {todos:'Todos',semana:'Semanal',mes:'Mensal',ano:'Anual'}[p] %></option>
+        <% }); %>
+      </select></div>
+    <div><label>Disciplina</label>
+      <select name="disciplina_id" onchange="this.form.submit()">
+        <option value="">Todas</option>
+        <% disciplinas.forEach(function(d){ %>
+          <option value="<%= d.id %>" <%= disciplinaId===d.id?'selected':'' %>><%= d.nome %></option>
+        <% }); %>
+      </select></div>
+  </form>
+</div>
+<div class="card" style="margin-top:12px">
+  <div class="metric"><%= mediaTurma.toFixed(1) %></div>
+  <div class="metric-label">Média geral da turma (<%= linhas.length %> alunos)</div>
+</div>
+<div class="card" style="margin-top:16px">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <h3>Média por aluno</h3>
+    <div style="display:flex;gap:6px">
+      <button type="button" class="btn btn-outline" id="btnLinha" style="padding:6px 10px" onclick="mudarTipo('line')"><i class="fa-solid fa-chart-line"></i> Linha</button>
+      <button type="button" class="btn btn-outline ativo" id="btnBarra" style="padding:6px 10px" onclick="mudarTipo('bar')"><i class="fa-solid fa-chart-column"></i> Barra</button>
+    </div>
+  </div>
+  <canvas id="graf" height="100"></canvas>
+</div>
+<div class="tabela-responsiva">
+<table style="margin-top:16px">
+  <thead><tr><th>Aluno</th><th>Provas</th><th>Média</th><th>Perdas foco</th><th></th></tr></thead>
+  <tbody>
+  <% linhas.forEach(function(l){ %>
+    <tr><td><%= l.aluno.nome %></td><td><%= l.provasConcluidas %></td>
+    <td><%= l.mediaNota.toFixed(1) %></td><td><%= l.totalPerdasFoco %></td>
+    <td><a href="/dashboard/aluno/<%= l.aluno.id %>">detalhes</a></td></tr>
+  <% }); %>
+  </tbody>
+</table>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const linhas = <%- JSON.stringify(linhas.map(l=>({nome:l.aluno.nome.split(' ')[0], media:l.mediaNota}))) %>;
+let graf;
+function desenhar(tipo) {
+  if (graf) graf.destroy();
+  graf = new Chart(document.getElementById('graf'), {
+    type: tipo,
+    data: {
+      labels: linhas.map(l => l.nome),
+      datasets: [{
+        label: 'Média por aluno', data: linhas.map(l => l.media),
+        backgroundColor: tipo === 'bar' ? '#005C6D' : 'rgba(0,92,109,.15)',
+        borderColor: '#005C6D', tension: .3, fill: tipo === 'line'
+      }]
+    },
+    options: { scales: { y: { min: 0, max: 10 } } }
+  });
+}
+function mudarTipo(tipo) {
+  desenhar(tipo);
+  document.getElementById('btnLinha').classList.toggle('ativo', tipo === 'line');
+  document.getElementById('btnBarra').classList.toggle('ativo', tipo === 'bar');
+}
+desenhar('bar');
+</script>

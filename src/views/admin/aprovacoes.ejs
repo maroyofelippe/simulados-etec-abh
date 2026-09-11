@@ -1,0 +1,40 @@
+<div style="display:flex;justify-content:space-between;align-items:center">
+  <h1>Aprovações de cadastro</h1>
+  <a class="btn btn-outline" href="/admin/usuarios"><i class="fa-solid fa-arrow-left"></i> Usuários</a>
+</div>
+
+<p class="metric-label">Professores que se auto-cadastraram e aguardam validação. Ao aprovar, atribua as turmas que o professor irá lecionar.</p>
+
+<% if (!pendentes.length) { %>
+  <div class="card">Nenhum cadastro pendente. 🎉</div>
+<% } %>
+
+<% pendentes.forEach(function (p) { %>
+  <div class="card" style="margin-bottom:16px">
+    <div class="grid grid-2">
+      <div>
+        <h3 style="margin:0 0 4px"><%= p.nome %> <span class="metric-label">(<%= p.perfil %>)</span></h3>
+        <p style="margin:2px 0"><i class="fa-solid fa-envelope"></i> <%= p.email %></p>
+        <p style="margin:2px 0"><i class="fa-solid fa-school"></i> <%= p.unidade ? p.unidade.nome : '—' %></p>
+        <p class="metric-label">Solicitado em <%= new Date(p.criado_em).toLocaleString('pt-BR') %></p>
+      </div>
+      <div>
+        <form method="POST" action="/admin/aprovacoes/<%= p.id %>/aprovar">
+          <label>Turmas que leciona</label>
+          <select name="turmas" multiple size="5" style="min-height:120px;width:100%">
+            <% turmas.forEach(function (t) { %>
+              <option value="<%= t.id %>"><%= t.nome %><%= t.serie ? ' — ' + t.serie : '' %> (<%= t.periodo %>)</option>
+            <% }); %>
+          </select>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-primario"><i class="fa-solid fa-check"></i> Aprovar</button>
+          </div>
+        </form>
+        <form method="POST" action="/admin/aprovacoes/<%= p.id %>/recusar" style="margin-top:8px"
+              onsubmit="return confirm('Recusar o cadastro de <%= p.nome %>?')">
+          <button class="btn btn-outline"><i class="fa-solid fa-xmark"></i> Recusar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+<% }); %>

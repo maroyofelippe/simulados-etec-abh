@@ -1,0 +1,36 @@
+<h1>Novo Simulado</h1>
+<div class="card">
+<form method="POST" action="/professor/simulados">
+  <label>Título</label><input name="titulo" required>
+  <div class="grid grid-2">
+    <div><label>Tipo</label>
+      <select name="tipo">
+        <option value="aleatorio_aluno">Aleatório por aluno (prova individual)</option>
+        <option value="geral">Simulado geral (mesma prova por turma)</option>
+      </select></div>
+    <div><label>Turma de aplicação</label>
+      <select name="turma_id"><option value="">— Todas —</option>
+        <% turmas.forEach(function(t){ %><option value="<%= t.id %>"><%= t.nome %></option><% }); %>
+      </select></div>
+  </div>
+  <div class="grid grid-2">
+    <div><label>Disciplina</label>
+      <select name="disciplina_id"><option value="">— Qualquer —</option>
+        <% disciplinas.forEach(function(d){ %><option value="<%= d.id %>"><%= d.nome %></option><% }); %>
+      </select></div>
+    <div><label>Tema (opcional)</label><input name="tema" placeholder="ex.: Interpretação de texto"></div>
+  </div>
+  <div class="grid grid-4">
+    <div><label>Qtd. questões (máx 20)</label><input type="number" name="qtd_questoes" value="20" min="1" max="20"></div>
+    <div><label>Fáceis</label><input type="number" name="dificuldade_facil" value="0" min="0"></div>
+    <div><label>Médias</label><input type="number" name="dificuldade_medio" value="0" min="0"></div>
+    <div><label>Difíceis</label><input type="number" name="dificuldade_dificil" value="0" min="0"></div>
+  </div>
+  <div class="grid grid-2">
+    <div><label>Duração (minutos)</label><input type="number" name="duracao_minutos" value="60" min="5"></div>
+    <div><label>Máx. saídas de foco (0 = anula por questão)</label><input type="number" name="max_perdas_foco" value="0" min="0"></div>
+  </div>
+  <p class="metric-label">Deixe a distribuição por dificuldade em 0 para sorteio livre. A soma respeita o limite de 20.</p>
+  <button class="btn btn-primario" style="margin-top:12px">Salvar simulado</button>
+</form>
+</div>

@@ -1,0 +1,33 @@
+<h1>Importar Usuários (CSV)</h1>
+<div class="card">
+  <p class="metric-label">Colunas obrigatórias: <b>nome, rm, turma, periodo</b>. A turma deve existir previamente na sua unidade.</p>
+  <% if (erro) { %><div class="alerta alerta-erro"><%= erro %></div><% } %>
+  <form method="POST" action="/admin/importar-usuarios" enctype="multipart/form-data">
+    <input type="file" name="arquivo" accept=".csv" required>
+    <button class="btn btn-primario" style="margin-top:12px">Importar</button>
+  </form>
+</div>
+
+<% if (relatorio) { %>
+<div class="card" style="margin-top:16px">
+  <h3>Relatório de importação</h3>
+  <div class="grid grid-3">
+    <div><div class="metric"><%= relatorio.total %></div><div class="metric-label">Total de linhas</div></div>
+    <div><div class="metric" style="color:var(--concluido)"><%= relatorio.sucessos %></div><div class="metric-label">Sucessos</div></div>
+    <div><div class="metric" style="color:var(--cancelado)"><%= relatorio.erros.length %></div><div class="metric-label">Erros</div></div>
+  </div>
+  <% if (relatorio.erros.length) { %>
+    <h4>Erros</h4>
+    <div class="tabela-responsiva">
+    <table><thead><tr><th>Linha</th><th>RM</th><th>Motivo</th></tr></thead><tbody>
+    <% relatorio.erros.forEach(function(e){ %><tr><td><%= e.linha %></td><td><%= e.rm||'—' %></td><td><%= e.motivo %></td></tr><% }); %>
+    </tbody></table>
+    </div>
+  <% } %>
+  <% if (relatorio.ignoradas && relatorio.ignoradas.length) { %>
+    <h4>Ignoradas</h4>
+    <ul><% relatorio.ignoradas.forEach(function(i){ %><li>Linha <%= i.linha %>: <%= i.motivo %></li><% }); %></ul>
+  <% } %>
+  <p class="metric-label">Senha inicial padrão definida em <code>SENHA_PADRAO_IMPORTACAO</code> (.env).</p>
+</div>
+<% } %>

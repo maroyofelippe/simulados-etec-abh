@@ -1,0 +1,81 @@
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+  <h1>Dashboard Geral</h1>
+  <form method="GET" style="display:flex;gap:8px;align-items:end;flex-wrap:wrap">
+    <div><label>Período</label>
+      <select name="periodo" onchange="this.form.submit()">
+        <% ['todos','semana','mes','ano'].forEach(function(p){ %>
+          <option value="<%= p %>" <%= periodo===p?'selected':'' %>><%= {todos:'Todos',semana:'Semanal',mes:'Mensal',ano:'Anual'}[p] %></option>
+        <% }); %>
+      </select></div>
+    <div><label>Disciplina</label>
+      <select name="disciplina_id" onchange="this.form.submit()">
+        <option value="">Todas</option>
+        <% disciplinas.forEach(function(d){ %>
+          <option value="<%= d.id %>" <%= disciplinaId===d.id?'selected':'' %>><%= d.nome %></option>
+        <% }); %>
+      </select></div>
+  </form>
+</div>
+
+<div class="grid grid-3">
+<% cards.forEach(function(c){ %>
+  <div class="card">
+    <h3><%= c.unidade.nome %></h3>
+    <div class="grid grid-2">
+      <div><div class="metric"><%= c.mediaNota.toFixed(1) %></div><div class="metric-label">Média de nota</div></div>
+      <div><div class="metric"><%= c.provasConcluidas %></div><div class="metric-label">Provas concluídas</div></div>
+    </div>
+    <p class="metric-label">Perdas de foco: <b><%= c.totalPerdasFoco %></b></p>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <span class="badge mencao-I">I: <%= c.mencoes.I %></span>
+      <span class="badge mencao-R">R: <%= c.mencoes.R %></span>
+      <span class="badge mencao-B">B: <%= c.mencoes.B %></span>
+      <span class="badge mencao-MB">MB: <%= c.mencoes.MB %></span>
+    </div>
+  </div>
+<% }); %>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <h3>Evolução da média (últimos meses)</h3>
+    <div style="display:flex;gap:6px">
+      <button type="button" class="btn btn-outline ativo" id="btnLinha" style="padding:6px 10px" onclick="mudarTipo('line')"><i class="fa-solid fa-chart-line"></i> Linha</button>
+      <button type="button" class="btn btn-outline" id="btnBarra" style="padding:6px 10px" onclick="mudarTipo('bar')"><i class="fa-solid fa-chart-column"></i> Barra</button>
+    </div>
+  </div>
+  <canvas id="grafSerie" height="90"></canvas>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h3>Comparar turmas</h3>
+  <p class="metric-label">Acesse <a href="/dashboard/comparar">a ferramenta de comparação lado a lado</a>.</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const serie = <%- JSON.stringify(serie) %>;
+let grafSerie;
+function desenhar(tipo) {
+  if (grafSerie) grafSerie.destroy();
+  grafSerie = new Chart(document.getElementById('grafSerie'), {
+    type: tipo,
+    data: {
+      labels: serie.map(s => s.mes),
+      datasets: [{
+        label: 'Média', data: serie.map(s => s.media),
+        borderColor: '#00C1CF',
+        backgroundColor: tipo === 'bar' ? '#00C1CF' : 'rgba(0,193,207,.15)',
+        tension: .3, fill: tipo === 'line'
+      }]
+    },
+    options: { scales: { y: { min: 0, max: 10 } } }
+  });
+}
+function mudarTipo(tipo) {
+  desenhar(tipo);
+  document.getElementById('btnLinha').classList.toggle('ativo', tipo === 'line');
+  document.getElementById('btnBarra').classList.toggle('ativo', tipo === 'bar');
+}
+desenhar('line');
+</script>

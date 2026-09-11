@@ -1,0 +1,41 @@
+<h1>Nova Questão</h1>
+<div class="card">
+<form method="POST" action="/professor/questoes">
+  <label>Enunciado</label><textarea name="enunciado" rows="3" required></textarea>
+  <div class="grid grid-3">
+    <div><label>Disciplina</label>
+      <select name="disciplina_id" required>
+        <% disciplinas.forEach(function(d){ %><option value="<%= d.id %>"><%= d.nome %></option><% }); %>
+      </select></div>
+    <div><label>Dificuldade</label>
+      <select name="dificuldade"><option>Fácil</option><option selected>Médio</option><option>Difícil</option></select></div>
+    <div><label>Série</label><input name="serie" placeholder="1ª Série EM"></div>
+  </div>
+  <label>Tema</label><input name="tema">
+
+  <label>Texto de apoio (opcional — comum em questões de Humanas)</label>
+  <select name="texto_apoio_id" id="texto_apoio_id" onchange="document.getElementById('novo-texto-apoio').style.display = this.value === 'novo' ? 'block' : 'none';">
+    <option value="">— Nenhum —</option>
+    <option value="novo">+ Criar novo texto de apoio</option>
+    <% textosApoio.forEach(function(ta){ %>
+      <option value="<%= ta.id %>"><%= ta.titulo || ('Texto #' + ta.id) %> — <%= ta.conteudo.length > 60 ? ta.conteudo.slice(0,60)+'…' : ta.conteudo %></option>
+    <% }); %>
+  </select>
+  <div id="novo-texto-apoio" style="display:none;margin-top:8px">
+    <label>Título do texto de apoio</label><input name="texto_apoio_titulo" placeholder="ex.: Êxodo rural no Brasil">
+    <label>Conteúdo do texto de apoio</label><textarea name="texto_apoio_conteudo" rows="5"></textarea>
+    <p class="metric-label">Para vincular outra questão a este mesmo texto, cadastre-a depois escolhendo-o na lista acima.</p>
+  </div>
+
+  <div class="grid grid-2">
+    <div><label>Alternativa A</label><input name="alt_a" required></div>
+    <div><label>Alternativa B</label><input name="alt_b" required></div>
+    <div><label>Alternativa C</label><input name="alt_c" required></div>
+    <div><label>Alternativa D</label><input name="alt_d" required></div>
+    <div><label>Alternativa E</label><input name="alt_e"></div>
+    <div><label>Gabarito</label>
+      <select name="gabarito"><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option></select></div>
+  </div>
+  <button class="btn btn-primario" style="margin-top:12px">Salvar questão</button>
+</form>
+</div>

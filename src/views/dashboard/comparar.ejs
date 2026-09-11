@@ -1,0 +1,101 @@
+<h1>Comparar Turmas</h1>
+<div class="card" style="margin-bottom:16px">
+  <form method="GET" id="f">
+    <div class="grid grid-2">
+      <div><label>Selecione as turmas (Ctrl/Cmd para múltiplas)</label>
+        <select id="sel" multiple size="6">
+          <% todasTurmas.forEach(function(t){ %>
+            <option value="<%= t.id %>" <%= selecionadas.includes(t.id)?'selected':'' %>><%= t.nome %></option>
+          <% }); %>
+        </select></div>
+      <div><label>Disciplina</label>
+        <select name="disciplina_id">
+          <option value="">Todas</option>
+          <% disciplinas.forEach(function(d){ %>
+            <option value="<%= d.id %>" <%= disciplinaId===d.id?'selected':'' %>><%= d.nome %></option>
+          <% }); %>
+        </select></div>
+    </div>
+    <input type="hidden" name="turmas" id="turmas">
+    <button class="btn btn-primario" style="margin-top:12px" onclick="montar(event)">Comparar</button>
+  </form>
+</div>
+
+<% if (comparativo.length) { %>
+<div class="grid grid-<%= Math.min(comparativo.length,3) %>">
+<% comparativo.forEach(function(c){ %>
+  <div class="card">
+    <h3><%= c.turma.nome %></h3>
+    <div class="metric"><%= c.mediaNota.toFixed(1) %></div>
+    <div class="metric-label">Média • <%= c.provasConcluidas %> provas • <%= c.totalPerdasFoco %> perdas de foco</div>
+  </div>
+<% }); %>
+</div>
+<div class="card" style="margin-top:16px">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <h3>Média por turma</h3>
+    <div style="display:flex;gap:6px">
+      <button type="button" class="btn btn-outline" id="btnLinha" style="padding:6px 10px" onclick="mudarTipo('line')"><i class="fa-solid fa-chart-line"></i> Linha</button>
+      <button type="button" class="btn btn-outline ativo" id="btnBarra" style="padding:6px 10px" onclick="mudarTipo('bar')"><i class="fa-solid fa-chart-column"></i> Barra</button>
+    </div>
+  </div>
+  <canvas id="graf" height="90"></canvas>
+  <% if (!disciplinaId) { %>
+    <p class="metric-label">No modo Linha, com "Todas" as disciplinas, cada disciplina é plotada separadamente.</p>
+  <% } %>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const comp = <%- JSON.stringify(comparativo.map(c=>({nome:c.turma.nome, media:c.mediaNota, porDisciplina:c.porDisciplina||null}))) %>;
+const filtrandoDisciplina = <%- JSON.stringify(!!disciplinaId) %>;
+const cores = ['#005C6D','#B20000','#A0C340','#8A29E6','#FFC24C','#4C7EFF','#FF4CA2','#00C1CF'];
+
+// Com "Todas" selecionado, decompõe a linha geral de cada turma em uma linha por disciplina
+function datasetsPorDisciplina() {
+  const nomes = new Map();
+  comp.forEach(c => (c.porDisciplina || []).forEach(d => nomes.set(d.id, d.nome)));
+  return Array.from(nomes.entries()).map(([id, nome], i) => ({
+    label: nome,
+    data: comp.map(c => {
+      const achado = (c.porDisciplina || []).find(d => d.id === id);
+      return achado ? achado.media : null;
+    }),
+    borderColor: cores[i % cores.length],
+    backgroundColor: cores[i % cores.length],
+    tension: .3, fill: false, spanGaps: true
+  }));
+}
+
+let graf;
+function desenhar(tipo) {
+  if (graf) graf.destroy();
+  const separarPorDisciplina = tipo === 'line' && !filtrandoDisciplina;
+  const datasets = separarPorDisciplina ? datasetsPorDisciplina() : [{
+    label: 'Média', data: comp.map(c => c.media),
+    backgroundColor: tipo === 'bar' ? cores : 'rgba(0,92,109,.15)',
+    borderColor: tipo === 'bar' ? cores : '#005C6D',
+    tension: .3, fill: tipo === 'line'
+  }];
+  graf = new Chart(document.getElementById('graf'), {
+    type: tipo,
+    data: { labels: comp.map(c => c.nome), datasets },
+    options: { scales: { y: { min: 0, max: 10 } }, plugins: { legend: { display: datasets.length > 1 } } }
+  });
+}
+function mudarTipo(tipo) {
+  desenhar(tipo);
+  document.getElementById('btnLinha').classList.toggle('ativo', tipo === 'line');
+  document.getElementById('btnBarra').classList.toggle('ativo', tipo === 'bar');
+}
+desenhar('bar');
+</script>
+<% } %>
+
+<script>
+function montar(e){
+  e.preventDefault();
+  const ids = Array.from(document.getElementById('sel').selectedOptions).map(o=>o.value);
+  document.getElementById('turmas').value = ids.join(',');
+  document.getElementById('f').submit();
+}
+</script>

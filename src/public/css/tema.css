@@ -1,0 +1,859 @@
+/* ==========================================================
+   Sistema de Simulados ETEC ABH
+   Design System baseado no Manual do Centro Paula Souza (CPS)
+   - Tipografia: Roboto / Roboto Slab
+   - Cores institucionais + tema claro/escuro
+   ========================================================== */
+
+/* ---------- Tokens de cor (Manual CPS) ---------- */
+:root {
+  /* Cores principais */
+  --vermelho-base: #B20000;
+  --vermelho-escuro: #7E0000;
+  --azul-base: #005C6D;
+  --azul-titulos-hover: #004854;
+  --azul-destaque: #00C1CF;
+  --secundario-hover: #00D8E8;
+
+  /* Auxiliares */
+  --verde: #A0C340;
+  --blueberry: #4C7EFF;
+  --crayola: #FFC24C;
+  --violeta: #8A29E6;
+  --coral: #FF4C4D;
+  --pink: #FF4CA2;
+
+  /* Feedback */
+  --cancelado: #D32719;
+  --andamento: #B78718;
+  --concluido: #3ACF1F;
+  --cancelado-light: #FDD5D1;
+  --andamento-light: #FFF5EA;
+  --concluido-light: #E8FBE4;
+
+  /* Neutras */
+  --cinza-texto: #666666;
+  --cinza-claro: #DADADA;
+  --cinza-hover: #E6E6E6;
+  --prata: #F8F8F8;
+  --white: #FFFFFF;
+
+  /* Régua tipográfica (múltiplos de 4px) */
+  --fonte-corpo: 'Roboto', system-ui, sans-serif;
+  --fonte-titulo: 'Roboto Slab', Georgia, serif;
+}
+
+/* ---------- Tema CLARO (padrão) ---------- */
+:root,
+[data-tema="claro"] {
+  --bg: var(--prata);
+  --bg-superficie: var(--white);
+  --texto: #1a1a1a;
+  --texto-suave: var(--cinza-texto);
+  --borda: var(--cinza-claro);
+  --primaria: var(--azul-base);
+  --primaria-hover: var(--azul-titulos-hover);
+  --acento: var(--azul-destaque);
+  --marca: var(--vermelho-base);
+  --sombra: 0 0 10px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- Tema ESCURO ---------- */
+[data-tema="escuro"] {
+  --bg: #0e1417;
+  --bg-superficie: #16212a;
+  --texto: #e9eef1;
+  --texto-suave: #a7b4bc;
+  --borda: #2a3a44;
+  --primaria: var(--azul-destaque);
+  --primaria-hover: var(--secundario-hover);
+  --acento: var(--secundario-hover);
+  --marca: #ff5a5a;
+  --sombra: 0 0 12px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- Base ---------- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fonte-corpo);
+  font-size: 16px;
+  /* padrão CPS */
+  line-height: 24px;
+  /* múltiplo de 4px */
+  background: var(--bg);
+  color: var(--texto);
+  transition: background .3s, color .3s;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--fonte-titulo);
+  color: var(--primaria);
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 36px;
+}
+
+h2 {
+  font-size: 28px;
+}
+
+h3 {
+  font-size: 24px;
+}
+
+h4 {
+  font-size: 20px;
+}
+
+a {
+  color: var(--primaria);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--primaria-hover);
+  text-decoration: underline;
+}
+
+/* ---------- Layout / navegação ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--primaria);
+  color: #fff;
+  padding: 12px 24px;
+  box-shadow: var(--sombra);
+}
+
+.topbar .marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--fonte-titulo);
+  font-size: 22px;
+}
+
+.topbar .marca .selo {
+  background: var(--marca);
+  color: #fff;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-weight: 700;
+}
+
+.topbar nav a {
+  color: #fff;
+  margin-left: 16px;
+}
+
+.topbar nav a:hover {
+  color: var(--acento);
+  text-decoration: none;
+}
+
+.topbar nav a i,
+.topbar nav .tema-toggle i,
+.topbar nav .dropdown-toggle i {
+  margin-right: 4px;
+}
+
+/* ---------- Dropdown (menu Admin) ---------- */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  margin-left: 16px;
+}
+
+.dropdown-toggle {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-family: var(--fonte-corpo);
+  font-size: 16px;
+  padding: 0;
+}
+
+.dropdown-toggle:hover {
+  color: var(--acento);
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  min-width: 220px;
+  background: var(--bg-superficie);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  box-shadow: var(--sombra);
+  padding: 6px;
+  z-index: 200;
+}
+
+.dropdown-menu.aberto {
+  display: block;
+}
+
+/* Especificidade elevada (.topbar + .dropdown-menu) para vencer ".topbar nav a", que
+   por estar aninhada dentro do <nav> herdaria a cor branca do texto do menu principal. */
+.topbar .dropdown-menu a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: var(--texto);
+  margin: 0;
+}
+
+.topbar .dropdown-menu a:hover {
+  background: var(--cinza-hover);
+  color: var(--primaria);
+  text-decoration: none;
+}
+
+[data-tema="escuro"] .topbar .dropdown-menu a:hover {
+  background: #1e2c36;
+}
+
+.container {
+  max-width: 1500px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.grid-6 {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+/* ---------- Cartões ---------- */
+.card {
+  background: var(--bg-superficie);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: var(--sombra);
+
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+.metric {
+  font-size: 40px;
+  font-family: var(--fonte-titulo);
+  color: var(--marca);
+}
+
+.metric-label {
+  color: var(--texto-suave);
+  font-size: 14px;
+  padding-top: 16px;
+}
+
+/* ---------- Placar (cards compactos em uma única linha) ---------- */
+.card-placar {
+  padding: 16px;
+  text-align: center;
+}
+
+.card-placar .metric {
+  font-size: 30px;
+}
+
+.card-placar .metric-label {
+  white-space: nowrap;
+}
+
+/* ---------- Rodapé ----------
+   Fixo no fim da viewport com z-index negativo: fica "atrás" do conteúdo normal
+   (que tem z-index automático 0) e só aparece quando o usuário rola até o fim,
+   criando o efeito de revelação. O espaço reservado no fim do conteúdo é
+   calculado em JS (ver ajustarEspacoRodape em tema.js), pois a altura do
+   rodapé varia com o tamanho da tela/fonte. */
+.rodape {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: +2;
+  text-align: center;
+  padding: 8px 8px;
+  border-top: 2px solid var(--borda);
+  color: var(--texto-suave);
+  font-size: 1rem;
+  background-color: #1e2c36;
+}
+
+.rodape p:hover {
+  font-size: larger;
+  font-weight: bolder;
+}
+
+/* ---------- Botões ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 16px;
+  font-family: var(--fonte-corpo);
+  font-weight: 500;
+  transition: all .25s;
+}
+
+.btn-primario {
+  background: var(--primaria);
+  color: #fff;
+}
+
+.btn-primario:hover {
+  background: var(--primaria-hover);
+  color: #fff;
+  text-decoration: none;
+}
+
+.btn-destaque {
+  background: var(--acento);
+  color: #012a30;
+}
+
+.btn-perigo {
+  background: var(--vermelho-base);
+  color: #fff;
+}
+
+.btn-perigo:hover {
+  background: var(--vermelho-escuro);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--primaria);
+  color: var(--primaria);
+}
+
+.btn-outline.ativo {
+  background: var(--primaria);
+  color: #fff;
+}
+
+/* ---------- Tabelas ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-superficie);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th,
+td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--borda);
+}
+
+th {
+  background: var(--primaria);
+  color: #fff;
+  font-weight: 500;
+}
+
+tr:hover td {
+  background: var(--cinza-hover);
+}
+
+[data-tema="escuro"] tr:hover td {
+  background: #1e2c36;
+}
+
+/* ---------- Formulários ---------- */
+label {
+  display: block;
+  margin: 12px 0 4px;
+  font-weight: 500;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  background: var(--bg-superficie);
+  color: var(--texto);
+  font-family: var(--fonte-corpo);
+  font-size: 16px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--acento);
+  border-color: var(--acento);
+}
+
+/* ---------- Menções e badges ---------- */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mencao-I {
+  background: var(--cancelado-light);
+  color: var(--cancelado);
+}
+
+.mencao-R {
+  background: var(--andamento-light);
+  color: var(--andamento);
+}
+
+.mencao-B {
+  background: #E4F0FB;
+  color: var(--blueberry);
+}
+
+.mencao-MB {
+  background: var(--concluido-light);
+  color: var(--concluido);
+}
+
+/* ---------- Alertas ---------- */
+.alerta {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin: 12px 0;
+}
+
+.alerta-erro {
+  background: var(--cancelado-light);
+  color: var(--cancelado);
+}
+
+.alerta-ok {
+  background: var(--concluido-light);
+  color: var(--concluido);
+}
+
+.alerta-aviso {
+  background: var(--andamento-light);
+  color: var(--andamento);
+}
+
+/* ---------- Alternador de tema ---------- */
+.tema-toggle {
+  background: rgba(255, 255, 255, .15);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+/* ---------- Tela de prova (anti-cola) ---------- */
+.prova-wrap {
+  max-width: 760px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.cronometro {
+  font-family: var(--fonte-titulo);
+  font-size: 28px;
+  color: var(--marca);
+}
+
+.cronometro.alerta-tempo {
+  animation: piscar 1s infinite;
+}
+
+@keyframes piscar {
+  50% {
+    opacity: .4;
+  }
+}
+
+.questao-box {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.texto-apoio {
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background: var(--bg-superficie);
+}
+
+.texto-apoio h4 {
+  margin: 0 0 8px;
+  color: var(--texto-suave);
+}
+
+.texto-apoio p {
+  white-space: pre-wrap;
+}
+
+.alternativa {
+  display: block;
+  padding: 12px 16px;
+  margin: 8px 0;
+  border: 2px solid var(--borda);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .2s;
+  background: var(--bg-superficie);
+}
+
+.alternativa:hover {
+  border-color: var(--acento);
+}
+
+.alternativa.selecionada {
+  border-color: var(--primaria);
+  background: rgba(0, 193, 207, .08);
+}
+
+.foco-aviso {
+  color: var(--cancelado);
+  font-weight: 700;
+}
+
+/* Caractere-armadilha invisível anti-IA */
+.trap {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  font-size: 0;
+}
+
+/* ---------- Logo oficial (CPS) ---------- */
+.logo-oficial {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 5%;
+  padding: 0;
+  width: 100px;
+  height: auto;
+  z-index: 1000;
+}
+
+/* ---------- Tela de login ---------- */
+body.login-page {
+  position: relative;
+  min-height: 100vh;
+}
+
+body.login-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url('/img/etec207_cores.png');
+  background-size: 64%;
+  background-position: left;
+  background-repeat: no-repeat;
+
+  opacity: 0.4;
+  z-index: -1;
+}
+
+.login-page .login-card {
+  max-width: 420px;
+  width: 100%;
+  margin-top: 1%;
+  margin-left: 75%;
+  align-items: flex-end;
+  padding: 0 16px;
+}
+
+/* ---------- Tabelas com rolagem horizontal (mobile) ---------- */
+.tabela-responsiva {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+}
+
+/* ---------- Acessibilidade ---------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 8px;
+  z-index: 1000;
+  background: var(--primaria);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 0 0 8px 8px;
+  transition: top .15s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+a:focus-visible,
+button:focus-visible,
+.alternativa input:focus-visible+strong,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 2px;
+}
+
+.alternativa:has(input:focus-visible) {
+  outline: 3px solid var(--acento);
+  outline-offset: 2px;
+}
+
+/* Visualmente oculto, mas mantém o input real acessível a teclado/leitor de tela
+   (display:none o removeria da árvore de acessibilidade e da ordem de tabulação) */
+.alternativa input[type="radio"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+}
+
+/* ---------- Botão hambúrguer (nav mobile) ---------- */
+.menu-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 22px;
+  padding: 4px 8px;
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 900px) {
+
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Muitas telas usam "style=display:flex" inline para cabeçalhos (título + botão) e
+     barras de filtro. Sem isso elas estouram a largura em vez de quebrar linha em
+     telas de ~360-430px (iPhone 13, Galaxy S20+, Motorola Edge 20 Pro). */
+  [style*="display:flex"]:not([style*="flex-direction:column"]) {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  [style*="display:flex"]:not([style*="flex-direction:column"])>* {
+    min-width: 0;
+  }
+
+  /* Alvo de toque mínimo (~44px) para botões e campos */
+  .btn {
+    min-height: 44px;
+  }
+
+  /* Tipografia e espaçamentos reduzidos */
+  h1 {
+    font-size: 26px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  h3 {
+    font-size: 19px;
+  }
+
+  .container {
+    margin: 16px auto;
+    padding: 0 12px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .metric {
+    font-size: 32px;
+  }
+
+  /* Tabelas: em vez de espremer colunas até ficarem ilegíveis, força rolagem */
+  .tabela-responsiva table {
+    min-width: 560px;
+  }
+
+  /* Tela de prova */
+  .prova-wrap {
+    margin: 16px auto;
+  }
+
+  .cronometro {
+    font-size: 22px;
+  }
+
+  /* Login: card ocupa a largura útil e fica mais próximo do topo */
+  .login-page .login-card {
+    margin: 6vh auto;
+  }
+
+  body.login-page::before {
+    background-position: center;
+    background-size: cover;
+    opacity: .18;
+  }
+
+  /* ---- Menu de navegação mobile ---- */
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  .topbar nav {
+    display: none;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, .25);
+    padding-top: 8px;
+  }
+
+  .topbar nav.aberto {
+    display: flex;
+  }
+
+  .topbar nav a,
+  .topbar nav .tema-toggle,
+  .topbar nav .dropdown {
+    margin-left: 0;
+  }
+
+  .topbar nav a,
+  .topbar nav .dropdown-toggle {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px 4px;
+  }
+
+  .topbar nav .tema-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    justify-content: flex-start;
+    border-radius: 0;
+    margin-top: 4px;
+  }
+
+  .dropdown {
+    width: 100%;
+  }
+
+  .dropdown-menu {
+    position: static;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+    margin-top: 0;
+    padding: 0 0 0 16px;
+    width: 100%;
+  }
+
+  .topbar .dropdown-menu a {
+    color: #fff;
+  }
+
+  .topbar .dropdown-menu a:hover {
+    background: rgba(255, 255, 255, .12);
+    color: #fff;
+  }
+}
+
+/* Prova respondida com o celular deitado: economiza espaço vertical */
+@media (max-height: 500px) and (orientation: landscape) {
+  .topbar {
+    padding: 8px 16px;
+  }
+
+  .prova-wrap {
+    margin: 10px auto;
+  }
+
+  .cronometro {
+    font-size: 20px;
+  }
+}
