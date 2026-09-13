@@ -84,10 +84,11 @@ CREATE TABLE sessoes (
   id INT AUTO_INCREMENT PRIMARY KEY,
   usuario_id INT NOT NULL,
   inicio DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ultima_atividade DATETIME,
   fim DATETIME,
   duracao_segundos INT,
   ip VARCHAR(45),
-  encerrada_por ENUM('logout','timeout','ativa') DEFAULT 'ativa',
+  encerrada_por ENUM('logout','timeout','ativa','forcado') DEFAULT 'ativa',
   criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
   atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT fk_sessao_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id)

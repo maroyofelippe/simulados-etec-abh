@@ -9,9 +9,18 @@
 </div>
 <div class="tabela-responsiva">
 <table>
-  <thead><tr><th>Nome</th><th>Perfil</th><th>Situação</th><th>RM</th><th>Turma</th><th>Último login</th><th>Tempo logado</th><th>Ações</th></tr></thead>
+  <thead><tr><th>Nome</th><th>Perfil</th><th>Situação</th><th>RM</th><th>Turma</th><th>Último login</th><th>Tempo logado</th><th>Online</th><th>Sessão expira em</th><th>Ações</th></tr></thead>
   <tbody>
-  <% usuarios.forEach(function(u){ %>
+  <% usuarios.forEach(function(u){
+       // Sessão aberta (fim IS NULL) mais recente, se houver — ver admin.listarUsuarios.
+       // "online" considera expirada por inatividade uma sessão cuja última atividade
+       // (ou início, se ela nunca chegou a ser atualizada) já passou do SESSION_TIMEOUT,
+       // mesmo que o registro em banco ainda não tenha sido formalmente encerrado.
+       const sessaoAtiva = (u.sessoes && u.sessoes[0]) || null;
+       const baseMs = sessaoAtiva ? new Date(sessaoAtiva.ultima_atividade || sessaoAtiva.inicio).getTime() : null;
+       const expiraMs = baseMs ? baseMs + sessionTimeoutMin * 60000 : null;
+       const online = !!(expiraMs && expiraMs > Date.now());
+  %>
     <tr>
       <td><%= u.nome %><%- u.is_root ? ' <i class="fa-solid fa-key" title="root"></i>' : '' %></td>
       <td><%= u.perfil %></td>
@@ -25,10 +34,25 @@
       <td><%= u.turma ? u.turma.nome : '—' %></td>
       <td><%= u.ultimo_login ? new Date(u.ultimo_login).toLocaleString('pt-BR') : '—' %></td>
       <td><%= Math.floor((u.tempo_logado_total||0)/60) %> min</td>
+      <td>
+        <% if (online) { %>
+          <span style="color:var(--concluido);white-space:nowrap">● online</span>
+        <% } else { %>
+          <span style="color:var(--cancelado);white-space:nowrap">○ offline</span>
+        <% } %>
+      </td>
+      <td>
+        <% if (online) { %>
+          <span class="contador-sessao" data-expira="<%= expiraMs %>">--:--</span>
+        <% } else { %>—<% } %>
+      </td>
       <td style="white-space:nowrap">
         <a class="btn btn-outline" style="padding:6px 10px" href="/admin/usuarios/<%= u.id %>/editar" title="Editar"><i class="fa-solid fa-pen"></i></a>
         <button class="btn btn-outline" style="padding:6px 10px" title="Resetar senha" onclick="resetarSenha(<%= u.id %>)"><i class="fa-solid fa-key"></i></button>
         <% if(u.perfil==='aluno'){ %><a class="btn btn-outline" style="padding:6px 10px" href="/dashboard/aluno/<%= u.id %>" title="Desempenho"><i class="fa-solid fa-chart-line"></i></a><% } %>
+        <% if (online) { %>
+          <button class="btn btn-outline btn-desconectar" style="padding:6px 10px" title="Desconectar" data-id="<%= u.id %>" data-nome="<%= u.nome %>"><i class="fa-solid fa-plug-circle-xmark"></i></button>
+        <% } %>
       </td>
     </tr>
   <% }); %>
@@ -43,4 +67,34 @@ async function resetarSenha(id) {
   if (!r.ok) { alert(d.erro); return; }
   alert(d.mensagem + '\nSenha padrão: ' + d.senha_padrao);
 }
+
+document.querySelectorAll('.btn-desconectar').forEach(function (btn) {
+  btn.addEventListener('click', async function () {
+    const id = btn.dataset.id;
+    const nome = btn.dataset.nome;
+    if (!confirm('Desconectar "' + nome + '" da plataforma agora?')) return;
+    const r = await fetch('/admin/usuarios/' + id + '/desconectar', { method: 'POST' });
+    const d = await r.json();
+    if (!r.ok) { alert(d.erro); return; }
+    alert(d.mensagem);
+    location.reload();
+  });
+});
+
+// Contagem regressiva local do tempo até o timeout por inatividade (não requer
+// recarregar a página; o valor real continua sendo decidido pelo servidor).
+function formatarRestante(ms) {
+  if (ms <= 0) return 'expirando…';
+  const totalSeg = Math.floor(ms / 1000);
+  const min = Math.floor(totalSeg / 60);
+  const seg = totalSeg % 60;
+  return min + ':' + String(seg).padStart(2, '0');
+}
+function atualizarContadoresSessao() {
+  document.querySelectorAll('.contador-sessao').forEach(function (el) {
+    el.textContent = formatarRestante(parseInt(el.dataset.expira, 10) - Date.now());
+  });
+}
+atualizarContadoresSessao();
+setInterval(atualizarContadoresSessao, 1000);
 </script>

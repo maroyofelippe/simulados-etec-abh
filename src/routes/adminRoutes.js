@@ -24,6 +24,7 @@ router.get('/usuarios', admin.listarUsuarios);
 router.get('/usuarios/:id/editar', admin.editarUsuarioForm);
 router.post('/usuarios/:id', admin.atualizarUsuario);
 router.post('/usuarios/:id/resetar-senha', admin.resetarSenha);
+router.post('/usuarios/:id/desconectar', admin.desconectarUsuario);
 router.post('/usuarios/:id/excluir', exigirRoot, admin.excluirUsuario);
 
 // Aprovação de auto-cadastro de professores

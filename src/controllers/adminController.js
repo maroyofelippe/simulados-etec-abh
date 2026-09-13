@@ -10,6 +10,7 @@ const {
   Unidade, Turma, Disciplina, Usuario, Sessao, ProvaAplicada, Questao, Simulado, TextoApoio, sequelize
 } = require('../models');
 const env = require('../config/env');
+const { encerrarSessao } = require('../middlewares/auth');
 
 // ---- Unidades ----
 exports.listarUnidades = async (req, res, next) => {
@@ -121,10 +122,46 @@ exports.criarDisciplina = async (req, res, next) => {
 exports.listarUsuarios = async (req, res, next) => {
   try {
     const usuarios = await Usuario.findAll({
-      include: [{ model: Turma, as: 'turma' }], order: [['nome', 'ASC']], limit: 500
+      include: [
+        { model: Turma, as: 'turma' },
+        // Sessão aberta (fim IS NULL) mais recente de cada usuário — usada na view
+        // para indicar "logado?" e o tempo restante até o timeout por inatividade.
+        // Um mesmo usuário pode ter mais de uma sessão aberta simultânea (ex.: aba
+        // antiga cujo navegador fechou sem passar pelo /logout) — ordena pela
+        // atividade mais recente de fato (não pelo id) para pegar a que reflete
+        // melhor "o usuário está usando o sistema agora". separate:true evita
+        // duplicar linhas do JOIN principal (turma) e permite limit/order por usuário.
+        {
+          model: Sessao, as: 'sessoes', where: { fim: null }, required: false,
+          separate: true, order: [[sequelize.literal('COALESCE(ultima_atividade, inicio)'), 'DESC']], limit: 1
+        }
+      ],
+      order: [['nome', 'ASC']], limit: 500
     });
     const pendentes = await Usuario.count({ where: { status_cadastro: 'auto_pendente' } });
-    res.render('admin/usuarios', { titulo: 'Usuários', usuarios, pendentes });
+    res.render('admin/usuarios', {
+      titulo: 'Usuários', usuarios, pendentes, sessionTimeoutMin: env.sessionTimeoutMin
+    });
+  } catch (err) { next(err); }
+};
+
+// Desconexão forçada: encerra TODAS as sessões abertas do usuário em banco (ele
+// pode ter mais de uma — outra aba, outro dispositivo, ou uma antiga esquecida
+// aberta). O cookie do JWT no navegador do usuário-alvo continua existindo, mas
+// o middleware de autenticação rejeita o token assim que "sessoes.fim" for
+// preenchido — a próxima requisição dele já cai de volta na tela de login.
+exports.desconectarUsuario = async (req, res, next) => {
+  try {
+    const usuarioAlvo = await Usuario.findByPk(req.params.id);
+    if (!usuarioAlvo) return res.status(404).json({ erro: 'Usuário não encontrado.' });
+    if (usuarioAlvo.id === req.usuario.id) {
+      return res.status(400).json({ erro: 'Não é possível desconectar o próprio usuário logado.' });
+    }
+    const sessoesAtivas = await Sessao.findAll({ where: { usuario_id: usuarioAlvo.id, fim: null } });
+    if (!sessoesAtivas.length) return res.status(400).json({ erro: 'Usuário não está com sessão ativa.' });
+
+    await Promise.all(sessoesAtivas.map((s) => encerrarSessao(s.id, 'forcado')));
+    res.json({ ok: true, mensagem: `Sessão de ${usuarioAlvo.nome} encerrada.` });
   } catch (err) { next(err); }
 };
 

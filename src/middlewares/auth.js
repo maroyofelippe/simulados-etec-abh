@@ -17,6 +17,16 @@ async function autenticar(req, res, next) {
 
     const payload = jwtService.verificar(token); // lança se expirado/inválido
 
+    // A sessão precisa continuar aberta em banco — permite que o administrador
+    // force a desconexão de um usuário (/admin/usuarios) mesmo com o JWT
+    // ainda válido: basta encerrar o registro em "sessoes".
+    const sessaoAtual = await Sessao.findByPk(payload.sessaoId);
+    if (!sessaoAtual || sessaoAtual.fim) {
+      res.clearCookie('token');
+      res.clearCookie('ultima_atividade');
+      return redirecionarOuErro(req, res, 'Sessão encerrada. Faça login novamente.');
+    }
+
     // --- Controle de sessão por inatividade ---
     const agora = Date.now();
     const ultimaAtividade = req.cookies && req.cookies.ultima_atividade
@@ -31,8 +41,11 @@ async function autenticar(req, res, next) {
       return redirecionarOuErro(req, res, 'Sessão expirada por inatividade.');
     }
 
-    // Renova o marcador de atividade (sliding session)
+    // Renova o marcador de atividade (sliding session): no cookie (usado no cálculo
+    // acima) e espelhado em banco (para o /admin/usuarios calcular "logado?"/tempo
+    // restante). Não bloqueia a requisição se a escrita falhar.
     res.cookie('ultima_atividade', String(agora), { httpOnly: true, sameSite: 'lax' });
+    sessaoAtual.update({ ultima_atividade: new Date(agora) }).catch(() => {});
 
     const usuario = await Usuario.findByPk(payload.id);
     if (!usuario || !usuario.ativo) {
