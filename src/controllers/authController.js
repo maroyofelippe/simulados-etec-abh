@@ -22,7 +22,7 @@ const NOME_TURMA_FEIRA = 'Feira de Profissões';
 
 const RELACOES_VISITANTE = ['ex_aluno', 'candidato', 'responsavel', 'aluno'];
 const CURSOS_VISITANTE = [
-'Desenvolvimento de Sistemas-M-Tec-Manhã', 'Eletrônica-M-Tec-Manhã', 'Marketing-M-Tec-Manhã', 'Recursos Humanos-M-Tec-Manhã', 'Programação de Jogos Digitais-M-Tec-Tarde', 'Farmácia-M-Tec-Tarde', 'Biotecnologia-Tarde', 'Administração-M-Tec-Tarde', 'Informática para Internet-M-Tec-Noite', 'Administração-M-Tec-Noite',  'Eletroeletrônica-M-Tec-Noite', 'Eletrotécnica-Noite', 'Especialização em Gestão de Projetos- EAD', 'Farmácia-Noite', 'Guia de Turismo-EAD','Comércio-EAD', 'Secretariado-EAD', 'Transações Imobiliárias-EAD'
+'Desenvolvimento de Sistemas-M-Tec-Manhã', 'Eletrônica-M-Tec-Manhã', 'Marketing-M-Tec-Manhã', 'Recursos Humanos-M-Tec-Manhã', 'Programação de Jogos Digitais-M-Tec-Tarde', 'Farmácia-M-Tec-Tarde', 'Biotecnologia-Tarde', 'Administração-M-Tec-Tarde', 'Informática para Internet-M-Tec-Noite', 'Farmácia-Noite', 'Administração-M-Tec-Noite',  'Eletroeletrônica-M-Tec-Noite', 'Eletrotécnica-Noite', 'Especialização em Gestão de Projetos- EAD', 'Guia de Turismo-EAD','Comércio-EAD', 'Secretariado-EAD', 'Transações Imobiliárias-EAD'
 ];
 
 // GET /login
