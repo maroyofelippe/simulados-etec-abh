@@ -22,8 +22,7 @@ const NOME_TURMA_FEIRA = 'Feira de Profissões';
 
 const RELACOES_VISITANTE = ['ex_aluno', 'candidato', 'responsavel', 'aluno'];
 const CURSOS_VISITANTE = [
-  'Desenvolvimento de Sistemas', 'Jogos Digitais', 'Administração',
-  'Farmácia', 'Biotecnologia', 'Marketing'
+'Biotecnologia-Tarde', 'Comércio-EAD', 'Eletrotécnica-Noite', 'Administração-M-Tec-Tarde', 'Administração-M-Tec-Noite', 'Desenvolvimento de Sistemas-M-Tec-Manhã', 'Eletroeletrônica-M-Tec-Noite', 'Eletrônica-M-Tec-Manhã', 'Farmácia-M-Tec-Tarde', 'Informática para Internet-M-Tec-Noite', 'Marketing-M-Tec-Manhã', 'Programação de Jogos Digitais-M-Tec-Tarde', 'Recursos Humanos-M-Tec-Manhã', 'Especialização em Gestão de Projetos- EAD', 'Farmácia-Noite', 'Guia de Turismo-EAD', 'Secretariado-EAD', 'Transações Imobiliárias-EAD'
 ];
 
 // GET /login
