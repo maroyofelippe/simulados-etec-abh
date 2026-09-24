@@ -307,7 +307,7 @@ a:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: +2;
+  z-index: -1;
   text-align: center;
   padding: 8px 8px;
   border-top: 2px solid var(--borda);
@@ -316,9 +316,15 @@ a:hover {
   background-color: #1e2c36;
 }
 
-.rodape p:hover {
-  font-size: larger;
-  font-weight: bolder;
+.rodape p {
+  margin: 4px 0;
+}
+
+@media (hover: hover) {
+  .rodape p:hover {
+    font-size: larger;
+    font-weight: bolder;
+  }
 }
 
 /* ---------- Botões ---------- */
@@ -687,8 +693,9 @@ button:focus-visible,
 @media (max-width: 900px) {
 
   .grid-3,
-  .grid-4 {
-    grid-template-columns: repeat(2, 1fr);
+  .grid-4,
+  .grid-6 {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -698,6 +705,10 @@ button:focus-visible,
   .grid-3,
   .grid-4 {
     grid-template-columns: 1fr;
+  }
+
+  .grid-6 {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .topbar {
@@ -767,6 +778,14 @@ button:focus-visible,
   /* Login: card ocupa a largura útil e fica mais próximo do topo */
   .login-page .login-card {
     margin: 6vh auto;
+  }
+
+  /* Rodapé: fonte e espaçamento reduzidos para caber em telas estreitas
+     sem forçar rolagem horizontal */
+  .rodape {
+    padding: 6px 12px;
+    font-size: .8rem;
+    line-height: 1.3;
   }
 
   body.login-page::before {
