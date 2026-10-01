@@ -8,7 +8,7 @@ const { Usuario, Turma } = require('../models');
 
 // É coordenador ou root elevado?
 function ehGestor(u) {
-  return u.perfil === 'coordenador' || u.is_root;
+  return u.perfil === 'coordenador' || u.perfil === 'leitura' || u.is_root;
 }
 
 // Ids das turmas que o professor leciona (gestor => todas)

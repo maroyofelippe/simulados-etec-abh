@@ -1,7 +1,7 @@
 <h1>Bem-vindo(a), <%= usuario.nome.split(' ')[0] %>!</h1>
 <p class="metric-label">Perfil: <b><%= usuario.perfil %></b><%= usuario.is_root ? ' • ROOT ativo' : '' %></p>
 
-<% if (usuario.perfil === 'coordenador') { %>
+<% if (usuario.perfil === 'coordenador' || usuario.perfil === 'leitura') { %>
 <div class="grid grid-6" style="margin-top:16px">
   <div class="card card-placar">
     <br>
@@ -28,6 +28,7 @@
     <div class="metric"><%= placar.visitantesFeira %></div>
     <div class="metric-label">Visitantes da Feira</div>
   </div>
+  <% if (usuario.perfil === 'coordenador') { %>
   <div class="card card-placar" id="root-privilegio">
     <div class="metric"><i class="fa-solid fa-<%= usuario.is_root ? 'unlock' : 'lock' %>"></i></div>
     <div class="metric-label">Privilégio root<%= usuario.is_root ? ' — ativo' : '' %></div>
@@ -38,6 +39,7 @@
     <% } %>
     <p id="root-msg" class="metric-label" style="margin:6px 0 0"></p>
   </div>
+  <% } %>
 </div>
 <script>
 async function elevar(){
@@ -59,7 +61,7 @@ async function rebaixar(){
   <a class="card" href="/dashboard"><h3><i class="fa-solid fa-chart-column"></i> Dashboard</h3><p>Estatísticas por unidade, turma e aluno.</p></a>
   <a class="card" href="/professor/simulados"><h3><i class="fa-solid fa-file-lines"></i> Simulados</h3><p>Criar e publicar provas parametrizadas.</p></a>
   <a class="card" href="/professor/questoes"><h3><i class="fa-solid fa-folder-open"></i> Banco de Questões</h3><p>Cadastrar e importar questões (CSV).</p></a>
-  <% if (usuario.perfil === 'coordenador') { %>
+  <% if (usuario.perfil === 'coordenador' || usuario.perfil === 'leitura') { %>
   <a class="card" href="/admin/usuarios"><h3><i class="fa-solid fa-users"></i> Usuários</h3><p>Gestão, edição e reset de senha.</p></a>
   <a class="card" href="/admin/importar-usuarios"><h3><i class="fa-solid fa-file-import"></i> Importar Alunos</h3><p>Alimentação em massa via CSV.</p></a>
   <a class="card" href="/admin/unidades"><h3><i class="fa-solid fa-school"></i> Unidades</h3><p>Cadastro e logo institucional.</p></a>

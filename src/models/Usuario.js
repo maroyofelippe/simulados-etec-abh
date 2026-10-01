@@ -9,8 +9,10 @@ const Usuario = sequelize.define('Usuario', {
   email: { type: DataTypes.STRING(150), unique: true, validate: { isEmail: true } },
   rm: { type: DataTypes.STRING(30), unique: true },  // Registro de Matrícula (aluno)
   senha_hash: { type: DataTypes.STRING(255), allowNull: false },
+  // 'leitura': conta institucional de apenas-leitura, usada para exibir o
+  // sistema completo (sem poder alterar nada) durante a Feira de Profissões.
   perfil: {
-    type: DataTypes.ENUM('aluno', 'professor', 'coordenador', 'visitante_feira'),
+    type: DataTypes.ENUM('aluno', 'professor', 'coordenador', 'visitante_feira', 'leitura'),
     allowNull: false,
     defaultValue: 'aluno'
   },

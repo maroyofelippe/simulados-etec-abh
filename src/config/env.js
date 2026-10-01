@@ -23,6 +23,7 @@ const env = {
   sessionTimeoutMin: parseInt(process.env.SESSION_TIMEOUT || '30', 10),
   senhaPadraoImportacao: process.env.SENHA_PADRAO_IMPORTACAO || 'Etec@2025',
   senhaPadraoVisitante: process.env.SENHA_PADRAO_VISITANTE_FEIRA || 'Visitante@2026',
+  senhaPadraoLeitura: process.env.SENHA_PADRAO_LEITURA || 'Leitura@2026',
   rootPassword: process.env.ROOT_PASSWORD || 'RootEtec@2025',
   maxPerdasFoco: parseInt(process.env.MAX_PERDAS_FOCO || '0', 10),
   palavraCoringa: process.env.PALAVRA_CORINGA || 'abacaxi-quantico-etec'

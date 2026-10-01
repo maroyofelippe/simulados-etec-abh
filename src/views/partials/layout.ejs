@@ -31,7 +31,7 @@
           <a href="/professor/simulados"><i class="fa-solid fa-file-lines" aria-hidden="true"></i> Simulados</a>
           <a href="/professor/questoes"><i class="fa-solid fa-folder-open" aria-hidden="true"></i> Questões</a>
           <a href="/professor/alunos"><i class="fa-solid fa-users-gear" aria-hidden="true"></i> Meus Alunos</a>
-          <% if (usuario.perfil === 'coordenador') { %>
+          <% if (usuario.perfil === 'coordenador' || usuario.perfil === 'leitura') { %>
             <div class="dropdown">
               <button class="dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" onclick="alternarMenu(event)">
                 <i class="fa-solid fa-user-shield" aria-hidden="true"></i> Admin <i class="fa-solid fa-caret-down" aria-hidden="true"></i>

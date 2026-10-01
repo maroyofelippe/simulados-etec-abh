@@ -301,7 +301,11 @@ exports.resetarSenha = async (req, res, next) => {
   try {
     const usuario = await Usuario.findByPk(req.params.id);
     if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado.' });
-    const senhaPadrao = usuario.perfil === 'visitante_feira' ? env.senhaPadraoVisitante : env.senhaPadraoImportacao;
+    const senhaPadrao = usuario.perfil === 'visitante_feira'
+      ? env.senhaPadraoVisitante
+      : usuario.perfil === 'leitura'
+        ? env.senhaPadraoLeitura
+        : env.senhaPadraoImportacao;
     const senha_hash = await Usuario.gerarHash(senhaPadrao);
     await usuario.update({ senha_hash });
     res.json({

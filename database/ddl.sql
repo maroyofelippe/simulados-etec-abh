@@ -61,7 +61,7 @@ CREATE TABLE usuarios (
   -- Curso de interesse informado no auto-cadastro (captação ativa - feira de profissões)
   curso_interesse ENUM('Desenvolvimento de Sistemas','Jogos Digitais','Administração','Farmácia','Biotecnologia','Marketing'),
   senha_hash VARCHAR(255) NOT NULL,
-  perfil ENUM('aluno','professor','coordenador','visitante_feira') NOT NULL DEFAULT 'aluno',
+  perfil ENUM('aluno','professor','coordenador','visitante_feira','leitura') NOT NULL DEFAULT 'aluno',
   is_root BOOLEAN DEFAULT FALSE,
   -- Situação do cadastro: 'aprovado' (seed/importação/aluno ou visitante auto-cadastrado),
   -- 'auto_pendente' (professor auto-cadastrado aguardando liberação), 'recusado'

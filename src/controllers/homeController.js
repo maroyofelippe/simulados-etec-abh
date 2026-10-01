@@ -10,7 +10,7 @@ exports.exibir = async (req, res, next) => {
     const usuario = req.usuario;
     let placar = null;
 
-    if (usuario.perfil === 'coordenador') {
+    if (usuario.perfil === 'coordenador' || usuario.perfil === 'leitura') {
       const [turmas, alunos, unidades, questoes, visitantesFeira] = await Promise.all([
         Turma.count(),
         Usuario.count({ where: { perfil: 'aluno' } }),
