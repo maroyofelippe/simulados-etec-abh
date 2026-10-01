@@ -235,6 +235,13 @@ a:hover {
   padding: 0 16px;
 }
 
+/* Telas com mais conteúdo (ex.: desempenho do aluno) podem pedir mais
+   área útil, sem mudar o container padrão usado no resto do sistema. */
+.container-largo {
+  max-width: none;
+  width: 90%;
+}
+
 .grid {
   display: grid;
   gap: 16px;
@@ -294,6 +301,33 @@ a:hover {
 
 .card-placar .metric-label {
   white-space: nowrap;
+}
+
+/* ---------- Desempenho do aluno (Minhas Provas) ----------
+   Coluna da direita (radar) esticada pelo "align-items: stretch" padrão do
+   grid, ocupando a mesma altura total da coluna da esquerda (métricas +
+   ranking). */
+.desempenho-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+.desempenho-coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.desempenho-radar {
+  display: flex;
+  flex-direction: column;
+}
+
+.desempenho-radar .grafico-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 320px;
 }
 
 /* ---------- Rodapé ----------
@@ -691,6 +725,14 @@ button:focus-visible,
 
 /* ---------- Responsivo ---------- */
 @media (max-width: 900px) {
+
+  .desempenho-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .container-largo {
+    width: 100%;
+  }
 
   .grid-3,
   .grid-4,

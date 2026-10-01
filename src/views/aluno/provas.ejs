@@ -32,76 +32,80 @@
     <p>Você ainda não concluiu nenhuma avaliação. Assim que terminar a primeira, seu desempenho, ranking e radar por disciplina aparecem aqui.</p>
   </div>
 <% } else { %>
-  <div class="grid grid-2">
-    <div class="card card-placar">
-      <br>
-      <div class="metric"><%= desempenho.minhaMedia.toFixed(1) %></div>
-      <div class="metric-label">Minha média geral</div>
-    </div>
-    <div class="card card-placar">
-      <br>
-      <div class="metric"><%= desempenho.mediaTurma.toFixed(1) %></div>
-      <div class="metric-label">Média geral da minha turma</div>
-    </div>
-  </div>
+  <div class="desempenho-layout">
+    <div class="desempenho-coluna">
+      <div class="grid grid-2">
+        <div class="card card-placar">
+          <br>
+          <div class="metric"><%= desempenho.minhaMedia.toFixed(1) %></div>
+          <div class="metric-label">Minha média geral</div>
+        </div>
+        <div class="card card-placar">
+          <br>
+          <div class="metric"><%= desempenho.mediaTurma.toFixed(1) %></div>
+          <div class="metric-label">Média geral da minha turma</div>
+        </div>
+      </div>
 
-  <div class="card" style="margin-top:16px">
-    <h3>Ranking por avaliação</h3>
-    <p class="metric-label">Sua posição entre todos os alunos da unidade que já concluíram cada simulado.</p>
-    <div class="tabela-responsiva">
-      <table>
-        <thead>
-          <tr><th>Avaliação</th><th>Disciplina</th><th>Minha nota</th><th>Média da turma</th><th>Posição na unidade</th><th></th></tr>
-        </thead>
-        <tbody>
-          <% ranking.forEach(function(r){ %>
-            <tr>
-              <td><%= r.titulo %></td>
-              <td><%= r.disciplina %></td>
-              <td><b><%= r.minhaNota.toFixed(1) %></b></td>
-              <td><%= r.mediaTurma.toFixed(1) %></td>
-              <td><%= r.posicao %>º de <%= r.totalUnidade %></td>
-              <td><a class="btn btn-outline" style="padding:6px 10px" href="/aluno/provas/<%= r.provaId %>/resultado" aria-label="Ver resultado de <%= r.titulo %>">Ver resultado</a></td>
-            </tr>
-          <% }); %>
-        </tbody>
-      </table>
+      <div class="card">
+        <h3>Ranking por avaliação</h3>
+        <p class="metric-label">Sua posição entre todos os alunos da unidade que já concluíram cada simulado.</p>
+        <div class="tabela-responsiva">
+          <table>
+            <thead>
+              <tr><th>Avaliação</th><th>Disciplina</th><th>Minha nota</th><th>Média da turma</th><th>Posição na unidade</th><th></th></tr>
+            </thead>
+            <tbody>
+              <% ranking.forEach(function(r){ %>
+                <tr>
+                  <td><%= r.titulo %></td>
+                  <td><%= r.disciplina %></td>
+                  <td><b><%= r.minhaNota.toFixed(1) %></b></td>
+                  <td><%= r.mediaTurma.toFixed(1) %></td>
+                  <td><%= r.posicao %>º de <%= r.totalUnidade %></td>
+                  <td><a class="btn btn-outline" style="padding:6px 10px" href="/aluno/provas/<%= r.provaId %>/resultado" aria-label="Ver resultado de <%= r.titulo %>">Ver resultado</a></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <% if (radar.length >= 3) { %>
-  <div class="card" style="margin-top:16px">
-    <h3>Radar por disciplina</h3>
-    <p class="metric-label">Percentual de acertos acumulado em cada disciplina já cobrada nas suas avaliações — use para guiar seus estudos.</p>
-    <canvas id="grafRadar" height="260"></canvas>
+    <% if (radar.length >= 3) { %>
+    <div class="card desempenho-radar">
+      <h3>Radar por disciplina</h3>
+      <p class="metric-label">Percentual de acertos acumulado em cada disciplina já cobrada nas suas avaliações — use para guiar seus estudos.</p>
+      <div class="grafico-wrap"><canvas id="grafRadar"></canvas></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script>
+      const radarDados = <%- JSON.stringify(radar) %>;
+      new Chart(document.getElementById('grafRadar'), {
+        type: 'radar',
+        data: {
+          labels: radarDados.map(d => d.disciplina),
+          datasets: [{
+            label: '% de acertos',
+            data: radarDados.map(d => d.percentual),
+            borderColor: '#B20000',
+            backgroundColor: 'rgba(178,0,0,.2)',
+            pointBackgroundColor: '#B20000'
+          }]
+        },
+        options: { maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { stepSize: 20 } } } }
+      });
+    </script>
+    <% } else if (radar.length) { %>
+    <div class="card desempenho-radar">
+      <h3>Desempenho por disciplina</h3>
+      <ul>
+        <% radar.forEach(function(d){ %>
+          <li><%= d.disciplina %>: <b><%= d.percentual.toFixed(1) %>%</b> de acertos</li>
+        <% }); %>
+      </ul>
+      <p class="metric-label">O radar aparece assim que suas avaliações cobrirem ao menos 3 disciplinas diferentes.</p>
+    </div>
+    <% } %>
   </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <script>
-    const radarDados = <%- JSON.stringify(radar) %>;
-    new Chart(document.getElementById('grafRadar'), {
-      type: 'radar',
-      data: {
-        labels: radarDados.map(d => d.disciplina),
-        datasets: [{
-          label: '% de acertos',
-          data: radarDados.map(d => d.percentual),
-          borderColor: '#B20000',
-          backgroundColor: 'rgba(178,0,0,.2)',
-          pointBackgroundColor: '#B20000'
-        }]
-      },
-      options: { scales: { r: { min: 0, max: 100, ticks: { stepSize: 20 } } } }
-    });
-  </script>
-  <% } else if (radar.length) { %>
-  <div class="card" style="margin-top:16px">
-    <h3>Desempenho por disciplina</h3>
-    <ul>
-      <% radar.forEach(function(d){ %>
-        <li><%= d.disciplina %>: <b><%= d.percentual.toFixed(1) %>%</b> de acertos</li>
-      <% }); %>
-    </ul>
-    <p class="metric-label">O radar aparece assim que suas avaliações cobrirem ao menos 3 disciplinas diferentes.</p>
-  </div>
-  <% } %>
 <% } %>

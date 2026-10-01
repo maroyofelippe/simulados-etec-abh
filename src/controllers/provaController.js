@@ -40,7 +40,8 @@ exports.listarDisponiveis = async (req, res, next) => {
     const { desempenho, ranking, radar } = await montarDesempenho(aluno);
 
     res.render('aluno/provas', {
-      titulo: 'Minhas Provas', simulados: disponiveis, mapa, desempenho, ranking, radar
+      titulo: 'Minhas Provas', simulados: disponiveis, mapa, desempenho, ranking, radar,
+      containerClass: 'container-largo'
     });
   } catch (err) { next(err); }
 };

@@ -55,7 +55,7 @@
       <% } %>
     </nav>
   </header>
-  <main class="container" id="conteudo-principal" tabindex="-1">
+  <main class="container<%= typeof containerClass !== 'undefined' && containerClass ? ' ' + containerClass : '' %>" id="conteudo-principal" tabindex="-1">
     <%- body %>
   </main>
   <%- include('./footer') %>
