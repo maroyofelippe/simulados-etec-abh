@@ -7,6 +7,7 @@
 //  - Finalizar (auto ou manual) + calcular resultado/menção
 //  - Espelho da prova (view) e PDF com assinatura
 // ==========================================================
+const { Op } = require('sequelize');
 const {
   Simulado, ProvaAplicada, ProvaQuestao, Questao, Alternativa, TextoApoio,
   Resposta, EventoFoco, Resultado, Usuario, Turma, Unidade, Disciplina, sequelize
@@ -17,6 +18,7 @@ const pdfService = require('../services/pdfService');
 const env = require('../config/env');
 
 // GET /aluno/provas  -> lista simulados disponíveis para a turma do aluno
+//   + quadro de desempenho (individual x turma), ranking na unidade e radar por disciplina
 exports.listarDisponiveis = async (req, res, next) => {
   try {
     const aluno = req.usuario;
@@ -26,9 +28,108 @@ exports.listarDisponiveis = async (req, res, next) => {
     });
     const aplicadas = await ProvaAplicada.findAll({ where: { aluno_id: aluno.id } });
     const mapa = new Map(aplicadas.map((p) => [p.simulado_id, p]));
-    res.render('aluno/provas', { titulo: 'Minhas Provas', simulados, mapa });
+
+    // No topo, só as avaliações que o aluno ainda pode fazer/continuar
+    // (concluídas/expiradas saem da lista principal e passam a alimentar o
+    // quadro de desempenho/ranking logo abaixo).
+    const disponiveis = simulados.filter((s) => {
+      const p = mapa.get(s.id);
+      return !p || !['concluida', 'expirada'].includes(p.status);
+    });
+
+    const { desempenho, ranking, radar } = await montarDesempenho(aluno);
+
+    res.render('aluno/provas', {
+      titulo: 'Minhas Provas', simulados: disponiveis, mapa, desempenho, ranking, radar
+    });
   } catch (err) { next(err); }
 };
+
+const media = (arr) => (arr.length ? Math.round((arr.reduce((a, b) => a + b, 0) / arr.length) * 10) / 10 : 0);
+
+// Monta o quadro de desempenho do aluno exibido em /aluno/provas:
+//  - média individual x média da turma (geral)
+//  - por simulado concluído: minha nota, média da turma e ranking entre todos
+//    os alunos (do mesmo perfil) da unidade que concluíram aquele simulado
+//  - radar de % de acertos por disciplina (agregando todas as provas concluídas)
+async function montarDesempenho(aluno) {
+  const minhasProvas = await ProvaAplicada.findAll({
+    where: { aluno_id: aluno.id, status: 'concluida' },
+    include: [
+      { model: Resultado, as: 'resultado' },
+      { model: Simulado, as: 'simulado', include: [{ model: Disciplina, as: 'disciplina' }] }
+    ],
+    order: [['finalizada_em', 'DESC']]
+  });
+  const concluidas = minhasProvas.filter((p) => p.resultado);
+
+  if (!concluidas.length) {
+    return { desempenho: null, ranking: [], radar: [] };
+  }
+
+  const minhaMedia = media(concluidas.map((p) => Number(p.resultado.nota)));
+
+  // Média geral da turma (mesmo perfil do aluno logado: aluno x aluno, visitante x visitante)
+  const provasTurma = await ProvaAplicada.findAll({
+    where: { status: 'concluida' },
+    include: [
+      { model: Resultado, as: 'resultado' },
+      { model: Usuario, as: 'aluno', attributes: [], where: { turma_id: aluno.turma_id, perfil: aluno.perfil } }
+    ]
+  });
+  const mediaTurma = media(provasTurma.filter((p) => p.resultado).map((p) => Number(p.resultado.nota)));
+
+  // Ranking + comparação por simulado (entre os alunos da mesma unidade e perfil)
+  const ranking = [];
+  for (const p of concluidas) {
+    const naUnidade = await ProvaAplicada.findAll({
+      where: { simulado_id: p.simulado_id, status: 'concluida' },
+      include: [
+        { model: Resultado, as: 'resultado' },
+        {
+          model: Usuario, as: 'aluno', attributes: ['id', 'turma_id'],
+          where: { unidade_id: aluno.unidade_id, perfil: aluno.perfil }
+        }
+      ]
+    });
+    const comResultado = naUnidade.filter((x) => x.resultado);
+    const ordenado = comResultado.slice().sort((a, b) => Number(b.resultado.nota) - Number(a.resultado.nota));
+    const posicao = ordenado.findIndex((x) => x.aluno_id === aluno.id) + 1;
+    const notasTurma = comResultado.filter((x) => x.aluno.turma_id === aluno.turma_id)
+      .map((x) => Number(x.resultado.nota));
+
+    ranking.push({
+      simuladoId: p.simulado_id,
+      provaId: p.id,
+      titulo: p.simulado ? p.simulado.titulo : `Simulado #${p.simulado_id}`,
+      disciplina: p.simulado && p.simulado.disciplina ? p.simulado.disciplina.nome : 'Múltiplas disciplinas',
+      minhaNota: Number(p.resultado.nota),
+      mediaTurma: media(notasTurma),
+      posicao: posicao || null,
+      totalUnidade: comResultado.length
+    });
+  }
+
+  // Radar: % de acertos por disciplina, agregando as questões de todas as provas concluídas
+  const respostas = await Resposta.findAll({
+    where: { prova_aplicada_id: { [Op.in]: concluidas.map((p) => p.id) } },
+    include: [{ model: Questao, as: 'questao', include: [{ model: Disciplina, as: 'disciplina' }] }]
+  });
+  const porDisciplina = new Map();
+  respostas.forEach((r) => {
+    const nome = r.questao && r.questao.disciplina ? r.questao.disciplina.nome : 'Sem disciplina';
+    if (!porDisciplina.has(nome)) porDisciplina.set(nome, { total: 0, acertos: 0 });
+    const o = porDisciplina.get(nome);
+    o.total += 1;
+    if (r.correta) o.acertos += 1;
+  });
+  const radar = Array.from(porDisciplina.entries()).map(([disciplina, v]) => ({
+    disciplina,
+    percentual: v.total ? Math.round((v.acertos / v.total) * 1000) / 10 : 0
+  }));
+
+  return { desempenho: { minhaMedia, mediaTurma }, ranking, radar };
+}
 
 // POST /aluno/provas/:simuladoId/iniciar
 //   Gera (se ainda não existir) a prova individual sorteando questões.
