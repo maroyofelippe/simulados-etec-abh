@@ -51,20 +51,21 @@
       <% }); %>
     </ul>
   </div>
+  <div class="card" style="margin-top:16px">
+    <h3>Suas respostas abertas</h3>
+      <dl class="voc-respostas">
+        <% r.abertas.forEach(function(a){ %>
+          <dt><%= a.pergunta %></dt>
+          <dd><%= a.resposta || '(sem resposta)' %></dd>
+        <% }); %>
+      </dl>
+  </div>
 </div>
 
-<div class="card" style="margin-top:16px">
-  <h3>Suas respostas abertas</h3>
-  <dl class="voc-respostas">
-    <% r.abertas.forEach(function(a){ %>
-      <dt><%= a.pergunta %></dt>
-      <dd><%= a.resposta || '(sem resposta)' %></dd>
-    <% }); %>
-  </dl>
-</div>
+
 
 <div class="voc-acoes">
   <a class="btn btn-primario" href="/vocacional/resultado/baixar?formato=pdf"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i> Baixar PDF</a>
-  <a class="btn btn-outline" href="/vocacional/resultado/baixar?formato=json"><i class="fa-solid fa-file-code" aria-hidden="true"></i> Baixar dados (JSON)</a>
+  <!--<a class="btn btn-outline" href="/vocacional/resultado/baixar?formato=json"><i class="fa-solid fa-file-code" aria-hidden="true"></i> Baixar dados (JSON)</a>-->
   <button class="btn btn-outline" type="button" onclick="window.print()"><i class="fa-solid fa-print" aria-hidden="true"></i> Imprimir</button>
 </div>
