@@ -43,27 +43,29 @@
 <% }); %>
 </div>
 
-<div class="card" style="margin-top:16px">
-  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-    <h3>Evolução da média (últimos meses)</h3>
-    <div style="display:flex;gap:6px">
-      <button type="button" class="btn btn-outline ativo" id="btnLinha" style="padding:6px 10px" onclick="mudarTipo('line')"><i class="fa-solid fa-chart-line"></i> Linha</button>
-      <button type="button" class="btn btn-outline" id="btnBarra" style="padding:6px 10px" onclick="mudarTipo('bar')"><i class="fa-solid fa-chart-column"></i> Barra</button>
+<div class="desempenho-layout" style="margin-top:16px">
+  <div class="card grafico-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <h3>Evolução da média (últimos meses)</h3>
+      <div style="display:flex;gap:6px">
+        <button type="button" class="btn btn-outline ativo" id="btnLinha" style="padding:6px 10px" onclick="mudarTipo('line')"><i class="fa-solid fa-chart-line"></i> Linha</button>
+        <button type="button" class="btn btn-outline" id="btnBarra" style="padding:6px 10px" onclick="mudarTipo('bar')"><i class="fa-solid fa-chart-column"></i> Barra</button>
+      </div>
     </div>
+    <div class="grafico-wrap"><canvas id="grafSerie"></canvas></div>
   </div>
-  <canvas id="grafSerie" height="90"></canvas>
-</div>
 
-<div class="card" style="margin-top:16px">
-  <h3>Aproveitamento por disciplina — comparativo entre unidades</h3>
-  <p class="metric-label">
-    % de acertos por disciplina, somando todos os simulados concluídos entre as turmas<% if (serieAno) { %> do <%= serieAno %>º ano do Ensino Médio<% } %>.
-  </p>
-  <% if (!radarUnidades.labels.length) { %>
-    <p class="metric-label">Nenhum dado concluído encontrado para este filtro.</p>
-  <% } else { %>
-    <canvas id="grafRadarUnidades" height="110"></canvas>
-  <% } %>
+  <div class="card grafico-card">
+    <h3>Aproveitamento por disciplina — comparativo entre unidades</h3>
+    <p class="metric-label">
+      % de acertos por disciplina, somando todos os simulados concluídos entre as turmas<% if (serieAno) { %> do <%= serieAno %>º ano do Ensino Médio<% } %>.
+    </p>
+    <% if (!radarUnidades.labels.length) { %>
+      <p class="metric-label">Nenhum dado concluído encontrado para este filtro.</p>
+    <% } else { %>
+      <div class="grafico-wrap"><canvas id="grafRadarUnidades"></canvas></div>
+    <% } %>
+  </div>
 </div>
 
 <div class="card" style="margin-top:16px">
@@ -88,7 +90,7 @@ function desenhar(tipo) {
         tension: .3, fill: tipo === 'line'
       }]
     },
-    options: { scales: { y: { min: 0, max: 10 } } }
+    options: { maintainAspectRatio: false, scales: { y: { min: 0, max: 10 } } }
   });
 }
 function mudarTipo(tipo) {
@@ -113,7 +115,7 @@ if (radarUnidades.labels.length) {
         pointBackgroundColor: coresUnidades[i % coresUnidades.length]
       }))
     },
-    options: { scales: { r: { min: 0, max: 100, ticks: { stepSize: 20 } } } }
+    options: { maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { stepSize: 20 } } } }
   });
 }
 </script>

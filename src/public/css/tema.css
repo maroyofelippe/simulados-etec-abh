@@ -303,10 +303,9 @@ a:hover {
   white-space: nowrap;
 }
 
-/* ---------- Desempenho do aluno (Minhas Provas) ----------
-   Coluna da direita (radar) esticada pelo "align-items: stretch" padrão do
-   grid, ocupando a mesma altura total da coluna da esquerda (métricas +
-   ranking). */
+/* ---------- Layout de 2 colunas para gráficos (desempenho do aluno, dashboard) ----------
+   A coluna da direita é esticada pelo "align-items: stretch" padrão do grid,
+   ocupando a mesma altura total da coluna da esquerda. */
 .desempenho-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -319,12 +318,12 @@ a:hover {
   gap: 16px;
 }
 
-.desempenho-radar {
+.grafico-card {
   display: flex;
   flex-direction: column;
 }
 
-.desempenho-radar .grafico-wrap {
+.grafico-card .grafico-wrap {
   position: relative;
   flex: 1;
   min-height: 320px;

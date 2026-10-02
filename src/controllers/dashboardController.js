@@ -60,7 +60,8 @@ exports.geral = async (req, res, next) => {
     const radarUnidades = await aproveitamentoPorUnidade(unidades, whereProva, serieAno);
 
     res.render('dashboard/geral', {
-      titulo: 'Dashboard Geral', cards, serie, periodo, disciplinas, disciplinaId, serieAno, radarUnidades
+      titulo: 'Dashboard Geral', cards, serie, periodo, disciplinas, disciplinaId, serieAno, radarUnidades,
+      containerClass: 'container-largo'
     });
   } catch (err) { next(err); }
 };

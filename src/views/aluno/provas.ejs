@@ -73,7 +73,7 @@
     </div>
 
     <% if (radar.length >= 3) { %>
-    <div class="card desempenho-radar">
+    <div class="card grafico-card">
       <h3>Radar por disciplina</h3>
       <p class="metric-label">Percentual de acertos acumulado em cada disciplina já cobrada nas suas avaliações — use para guiar seus estudos.</p>
       <div class="grafico-wrap"><canvas id="grafRadar"></canvas></div>
@@ -97,7 +97,7 @@
       });
     </script>
     <% } else if (radar.length) { %>
-    <div class="card desempenho-radar">
+    <div class="card grafico-card">
       <h3>Desempenho por disciplina</h3>
       <ul>
         <% radar.forEach(function(d){ %>
