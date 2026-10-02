@@ -953,6 +953,11 @@ button:focus-visible,
 .voc-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
 .voc-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline; }
 .voc-item span { color: var(--texto-suave); font-variant-numeric: tabular-nums; }
+.voc-resultado-grid { align-items: start; }
+.voc-coluna-direita { display: grid; gap: 16px; }
+.voc-card-compacto .voc-lista { gap: 8px; }
+.voc-card-compacto .voc-medidor { height: 8px; }
+.voc-card-compacto h3 { margin-top: 0; margin-bottom: 8px; }
 .voc-medidor { grid-column: 1 / -1; height: 10px; border-radius: 99px; background: var(--borda); overflow: hidden; }
 .voc-medidor i { display: block; height: 100%; background: var(--primaria); border-radius: 99px; }
 .voc-item-top .voc-medidor i { background: var(--crayola); }

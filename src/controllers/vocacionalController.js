@@ -175,7 +175,8 @@ exports.resultado = async (req, res, next) => {
     if (aplicacao.status !== 'concluida') return res.redirect('/vocacional');
     const r = await vocService.carregarResultado(aplicacao);
     res.render('vocacional/resultado', {
-      titulo: 'Meu Resultado Vocacional', r, nomesAreas: r.nomesAreas, maxPorArea: vocService.MAX_POR_AREA
+      titulo: 'Meu Resultado Vocacional', r, nomesAreas: r.nomesAreas, maxPorArea: vocService.MAX_POR_AREA,
+      containerClass: 'container-largo'
     });
   } catch (err) { next(err); }
 };

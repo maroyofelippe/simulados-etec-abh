@@ -28,7 +28,7 @@
   <div class="alerta alerta-aviso" role="status">Notas muito próximas entre: <b><%= r.empateTecnico.map(function(c){ return nomesAreas[c]; }).join(', ') %></b>. Suas respostas abertas e uma conversa curta ajudam a decidir.</div>
 <% } %>
 
-<div class="grid grid-2" style="margin-top:24px">
+<div class="grid grid-2 voc-resultado-grid" style="margin-top:24px">
   <div class="card">
     <h3>Afinidade com cada curso</h3>
     <ul class="voc-lista">
@@ -40,7 +40,8 @@
       <% }); %>
     </ul>
   </div>
-  <div class="card">
+  <div class="voc-coluna-direita">
+  <div class="card voc-card-compacto">
     <h3>Afinidade por grande área</h3>
     <ul class="voc-lista">
       <% r.grupos.forEach(function(g){ var pct = Math.round(g.pontos / g.maximo * 100); %>
@@ -51,7 +52,7 @@
       <% }); %>
     </ul>
   </div>
-  <div class="card" style="margin-top:16px">
+  <div class="card">
     <h3>Suas respostas abertas</h3>
       <dl class="voc-respostas">
         <% r.abertas.forEach(function(a){ %>
@@ -59,6 +60,7 @@
           <dd><%= a.resposta || '(sem resposta)' %></dd>
         <% }); %>
       </dl>
+  </div>
   </div>
 </div>
 
