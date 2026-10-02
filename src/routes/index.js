@@ -6,6 +6,8 @@ const homeController = require('../controllers/homeController');
 router.use('/', require('./authRoutes'));
 router.use('/aluno', require('./alunoRoutes'));
 router.use('/api/provas', require('./apiProvaRoutes'));
+router.use('/vocacional', require('./vocacionalRoutes'));
+router.use('/api/vocacional', require('./apiVocacionalRoutes'));
 router.use('/professor', require('./professorRoutes'));
 router.use('/admin', require('./adminRoutes'));
 router.use('/dashboard', require('./dashboardRoutes'));

@@ -1,0 +1,24 @@
+<h1>Qual curso técnico combina com você?</h1>
+<p class="metric-label" style="max-width:60ch">
+  Responda <%= totalAfirmacoes %> afirmações e <%= totalAbertas %> perguntas curtas. No final, você vê as áreas com mais afinidade com o seu jeito.
+  Não existe resposta certa ou errada.
+</p>
+
+<div class="card voc-inicio">
+  <div class="grid grid-3">
+    <div class="card-placar"><div class="metric">~8</div><div class="metric-label">minutos</div></div>
+    <div class="card-placar"><div class="metric"><%= totalAreas %></div><div class="metric-label">cursos avaliados</div></div>
+    <div class="card-placar"><div class="metric"><%= totalAfirmacoes %></div><div class="metric-label">afirmações (notas de 1 a 5)</div></div>
+  </div>
+
+  <% if (aplicacao.status === 'em_andamento') { %>
+    <p style="margin-top:24px">Você já começou este teste. Suas respostas foram salvas — continue de onde parou.</p>
+  <% } %>
+
+  <form method="POST" action="/vocacional/iniciar" style="margin-top:24px">
+    <button class="btn btn-primario">
+      <i class="fa-solid fa-compass" aria-hidden="true"></i>
+      <%= aplicacao.status === 'em_andamento' ? 'Continuar teste' : 'Começar teste' %>
+    </button>
+  </form>
+</div>

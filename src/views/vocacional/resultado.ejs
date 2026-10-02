@@ -1,0 +1,63 @@
+<% const p = r.ranking[0]; const s = r.ranking[1]; %>
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+  <h1><%= r.nome.split(' ')[0] %>, este é o seu perfil</h1>
+</div>
+
+<div class="voc-principal">
+  <small>Maior afinidade · <%= p.pontos %> de <%= maxPorArea %> pontos</small>
+  <h2><%= p.curso %></h2>
+  <p><%= r.descricaoPrincipal %></p>
+</div>
+
+<div class="card" style="margin-top:12px">
+  <small class="metric-label">Segunda opção · <%= s.pontos %> de <%= maxPorArea %> pontos</small>
+  <h3 style="margin:4px 0 0"><%= s.curso %></h3>
+</div>
+
+<% if (r.perfilIndefinido) { %>
+  <div class="alerta alerta-aviso" role="status">Suas notas ficaram baixas em todas as áreas. Isso é normal: talvez você ainda não tenha se identificado com nenhuma delas. Vale uma conversa com o orientador para explorar melhor.</div>
+<% } %>
+<% if (r.empateTecnico.length > 1) { %>
+  <div class="alerta alerta-aviso" role="status">Notas muito próximas entre: <b><%= r.empateTecnico.map(function(c){ return nomesAreas[c]; }).join(', ') %></b>. Suas respostas abertas e uma conversa curta ajudam a decidir.</div>
+<% } %>
+
+<div class="grid grid-2" style="margin-top:24px">
+  <div class="card">
+    <h3>Afinidade com cada curso</h3>
+    <ul class="voc-lista">
+      <% r.ranking.forEach(function(x, idx){ %>
+        <li class="voc-item<%= idx === 0 ? ' voc-item-top' : '' %>">
+          <b><%= x.curso %></b><span><%= x.pontos %> / <%= maxPorArea %></span>
+          <div class="voc-medidor" role="img" aria-label="<%= x.pontos %> de <%= maxPorArea %> pontos"><i style="width:<%= Math.round(x.pontos / maxPorArea * 100) %>%"></i></div>
+        </li>
+      <% }); %>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Afinidade por grande área</h3>
+    <ul class="voc-lista">
+      <% r.grupos.forEach(function(g){ var pct = Math.round(g.pontos / g.maximo * 100); %>
+        <li class="voc-item">
+          <b><%= g.nome %></b><span><%= pct %>%</span>
+          <div class="voc-medidor" role="img" aria-label="<%= pct %> por cento"><i style="width:<%= pct %>%"></i></div>
+        </li>
+      <% }); %>
+    </ul>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h3>Suas respostas abertas</h3>
+  <dl class="voc-respostas">
+    <% r.abertas.forEach(function(a){ %>
+      <dt><%= a.pergunta %></dt>
+      <dd><%= a.resposta || '(sem resposta)' %></dd>
+    <% }); %>
+  </dl>
+</div>
+
+<div class="voc-acoes">
+  <a class="btn btn-primario" href="/vocacional/resultado/baixar?formato=pdf"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i> Baixar PDF</a>
+  <a class="btn btn-outline" href="/vocacional/resultado/baixar?formato=json"><i class="fa-solid fa-file-code" aria-hidden="true"></i> Baixar dados (JSON)</a>
+  <button class="btn btn-outline" type="button" onclick="window.print()"><i class="fa-solid fa-print" aria-hidden="true"></i> Imprimir</button>
+</div>

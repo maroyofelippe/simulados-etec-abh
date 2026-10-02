@@ -1,5 +1,18 @@
 <h1>Minhas Provas</h1>
 
+<% if (vocacional) { %>
+  <div class="card" role="region" aria-label="Teste vocacional">
+    <h3><i class="fa-solid fa-compass" aria-hidden="true"></i> Teste Vocacional</h3>
+    <% if (vocacional.status === 'concluida') { %>
+      <p>Você já concluiu o teste. Veja o resultado e baixe seus dados.</p>
+      <a class="btn btn-primario" href="/vocacional/resultado">Ver meu resultado</a>
+    <% } else { %>
+      <p>Descubra qual curso técnico combina com você. Leva cerca de 8 minutos.</p>
+      <a class="btn btn-primario" href="/vocacional"><%= vocacional.status === 'em_andamento' ? 'Continuar teste' : 'Fazer o teste' %></a>
+    <% } %>
+  </div>
+<% } %>
+
 <h2>Avaliações disponíveis</h2>
 <% if (!simulados.length) { %>
   <div class="card" role="status"><p>Nenhuma avaliação disponível para você no momento.</p></div>

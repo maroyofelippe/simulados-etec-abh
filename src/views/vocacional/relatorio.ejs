@@ -1,0 +1,47 @@
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+  <h1>Teste Vocacional — Feira de Profissões</h1>
+  <a class="btn btn-primario" href="/vocacional/relatorio/exportar"><i class="fa-solid fa-file-arrow-down"></i> Exportar relatório (CSV)</a>
+</div>
+<p class="metric-label">O teste é atribuído automaticamente a todo visitante da feira no auto-cadastro.</p>
+
+<div class="grid grid-3">
+  <div class="card card-placar"><br><div class="metric"><%= aplicacoes.length %></div><div class="metric-label">Testes atribuídos</div></div>
+  <div class="card card-placar"><br><div class="metric"><%= porStatus.concluida %></div><div class="metric-label">Concluídos</div></div>
+  <div class="card card-placar"><br><div class="metric"><%= porStatus.em_andamento + porStatus.pendente %></div><div class="metric-label">Em andamento / não iniciados</div></div>
+</div>
+
+<% if (Object.keys(porArea).length) { %>
+<div class="card" style="margin-top:16px">
+  <h3>Curso de maior afinidade (concluídos)</h3>
+  <canvas id="grafArea" height="120"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+  const porArea = <%- JSON.stringify(porArea) %>;
+  new Chart(document.getElementById('grafArea'), {
+    type: 'bar',
+    data: { labels: Object.keys(porArea), datasets: [{ label: 'Visitantes', data: Object.values(porArea), backgroundColor: '#005C6D' }] },
+    options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { precision: 0 } } } }
+  });
+</script>
+<% } %>
+
+<h2 style="margin-top:24px">Participantes</h2>
+<div class="tabela-responsiva" role="region" aria-label="Participantes do teste vocacional" tabindex="0">
+<table>
+  <thead><tr><th scope="col">Nome</th><th scope="col">Contato</th><th scope="col">Curso de interesse</th><th scope="col">Status</th><th scope="col">Afinidade principal</th><th scope="col">Alternativa</th></tr></thead>
+  <tbody>
+  <% aplicacoes.forEach(function(a){ %>
+    <tr>
+      <td><%= a.usuario.nome %></td>
+      <td><%= a.usuario.telefone || '' %><br><span class="metric-label"><%= a.usuario.email %></span></td>
+      <td><%= a.usuario.curso_interesse || '—' %></td>
+      <td><%= rotulosStatus[a.status] %></td>
+      <td><%= a.principal ? a.principal.nome : '—' %><%= a.perfil_indefinido ? ' (indefinido)' : '' %></td>
+      <td><%= a.alternativa ? a.alternativa.nome : '—' %></td>
+    </tr>
+  <% }); %>
+  <% if (!aplicacoes.length) { %><tr><td colspan="6">Nenhum participante ainda.</td></tr><% } %>
+  </tbody>
+</table>
+</div>

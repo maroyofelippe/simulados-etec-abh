@@ -78,4 +78,67 @@ function gerarEspelhoPDF(dados, res) {
   doc.end();
 }
 
-module.exports = { gerarEspelhoPDF };
+/**
+ * Gera o PDF do resultado do Teste Vocacional e faz stream para "res".
+ * @param {Object} dados { r (resultado de vocacionalService.carregarResultado), maxPorArea }
+ */
+function gerarVocacionalPDF(dados, res) {
+  const { r, maxPorArea } = dados;
+  const doc = new PDFDocument({ size: 'A4', margin: 40 });
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', 'attachment; filename=teste_vocacional.pdf');
+  doc.pipe(res);
+
+  doc.fontSize(16).fillColor(AZUL).text('ETEC ABH — Feira de Profissões', 40, 42);
+  doc.fontSize(11).fillColor(CINZA).text('Teste Vocacional — Ensino Técnico', 40, 64);
+  doc.moveTo(40, 86).lineTo(555, 86).strokeColor(AZUL).stroke();
+
+  doc.fontSize(11).fillColor('#000').text(`Participante: ${r.nome}`, 40, 98);
+  doc.text(`Realizado em: ${r.data ? new Date(r.data).toLocaleString('pt-BR') : '-'}`);
+
+  const principal = r.ranking[0];
+  const segundo = r.ranking[1];
+  doc.moveDown(1).fontSize(13).fillColor(AZUL)
+     .text(`Maior afinidade: ${principal.curso} (${principal.pontos} de ${maxPorArea} pontos)`);
+  doc.fontSize(10).fillColor('#000').text(r.descricaoPrincipal, { width: 515 });
+  doc.moveDown(0.4).fontSize(11).fillColor(AZUL)
+     .text(`Segunda opção: ${segundo.curso} (${segundo.pontos} de ${maxPorArea} pontos)`);
+
+  if (r.perfilIndefinido) {
+    doc.moveDown(0.5).fontSize(10).fillColor(VERMELHO)
+       .text('Notas baixas em todas as áreas: vale uma conversa exploratória com o orientador.', { width: 515 });
+  }
+  if (r.empateTecnico.length > 1) {
+    doc.moveDown(0.5).fontSize(10).fillColor(VERMELHO)
+       .text(`Notas muito próximas entre: ${r.empateTecnico.map((c) => r.nomesAreas[c]).join(', ')}.`, { width: 515 });
+  }
+
+  doc.moveDown(1).fontSize(12).fillColor(AZUL).text('Afinidade com cada curso');
+  doc.fontSize(10).fillColor('#000');
+  r.ranking.forEach((x) => {
+    const y = doc.y;
+    doc.text(x.curso, 40, y, { width: 220 });
+    doc.rect(270, y + 2, 200, 8).fillColor('#DADADA').fill();
+    doc.rect(270, y + 2, 200 * (x.pontos / maxPorArea), 8).fillColor(x.posicao === 1 ? '#FFC24C' : AZUL).fill();
+    doc.fillColor('#000').text(`${x.pontos} / ${maxPorArea}`, 480, y, { width: 70 });
+    doc.y = y + 16;
+  });
+
+  doc.moveDown(0.8).fontSize(12).fillColor(AZUL).text('Afinidade por grande área', 40);
+  doc.fontSize(10).fillColor('#000');
+  r.grupos.forEach((g) => doc.text(`${g.nome}: ${Math.round((g.pontos / g.maximo) * 100)}%`, 40));
+
+  doc.moveDown(0.8).fontSize(12).fillColor(AZUL).text('Respostas abertas', 40);
+  doc.fontSize(10);
+  r.abertas.forEach((a) => {
+    if (doc.y > 740) doc.addPage();
+    doc.fillColor('#000').text(a.pergunta, 40, undefined, { width: 515 });
+    doc.fillColor(CINZA).text(a.resposta || '(sem resposta)', { width: 515 });
+    doc.moveDown(0.4);
+  });
+
+  doc.end();
+}
+
+module.exports = { gerarEspelhoPDF, gerarVocacionalPDF };

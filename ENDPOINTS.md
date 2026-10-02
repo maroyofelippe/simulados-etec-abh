@@ -35,6 +35,21 @@
 | POST | `/api/provas/:id/foco` | 🔑 👤 aluno/visitante_feira | Registra perda de foco/copy/paste e anula questão |
 | POST | `/api/provas/:id/finalizar` | 🔑 👤 aluno/visitante_feira | Finaliza, calcula nota e menção |
 
+## Teste Vocacional (Feira de Profissões)
+O teste é atribuído automaticamente ao visitante no auto-cadastro (`voc_aplicacoes`); 1 teste por usuário.
+
+| Método | Rota | Proteção | Descrição |
+|---|---|---|---|
+| GET | `/vocacional` | 🔑 👤 visitante_feira | Tela inicial (retoma de onde parou; se concluído, vai ao resultado) |
+| POST | `/vocacional/iniciar` | 🔑 👤 visitante_feira | Embaralha as afirmações e abre o teste |
+| GET | `/vocacional/responder` | 🔑 👤 visitante_feira | Questionário (24 afirmações + 3 perguntas abertas) |
+| GET | `/vocacional/resultado` | 🔑 👤 visitante_feira | Curso principal/alternativo, ranking e grande área |
+| GET | `/vocacional/resultado/baixar?formato=json\|pdf` | 🔑 👤 visitante_feira | Download dos próprios dados |
+| GET | `/vocacional/relatorio` | 🔑 👤 coordenador/leitura | Captação: status e afinidade dos visitantes |
+| GET | `/vocacional/relatorio/exportar` | 🔑 👤 coordenador/leitura | Relatório em CSV |
+| POST | `/api/vocacional/responder` | 🔑 👤 visitante_feira | Salva/atualiza a nota (1–5) de uma afirmação |
+| POST | `/api/vocacional/finalizar` | 🔑 👤 visitante_feira | Salva respostas abertas e calcula o resultado (no servidor) |
+
 ## Professor — simulados e questões
 | Método | Rota | Proteção | Descrição |
 |---|---|---|---|

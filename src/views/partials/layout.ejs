@@ -26,6 +26,9 @@
         <a href="/"><i class="fa-solid fa-house" aria-hidden="true"></i> Início</a>
         <% if (usuario.perfil === 'aluno' || usuario.perfil === 'visitante_feira') { %>
           <a href="/aluno/provas"><i class="fa-solid fa-file-pen" aria-hidden="true"></i> Minhas Provas</a>
+          <% if (usuario.perfil === 'visitante_feira') { %>
+            <a href="/vocacional"><i class="fa-solid fa-compass" aria-hidden="true"></i> Teste Vocacional</a>
+          <% } %>
         <% } else { %>
           <a href="/dashboard"><i class="fa-solid fa-chart-column" aria-hidden="true"></i> Dashboard</a>
           <a href="/professor/simulados"><i class="fa-solid fa-file-lines" aria-hidden="true"></i> Simulados</a>
@@ -38,6 +41,7 @@
               </button>
               <div class="dropdown-menu">
                 <a href="/dashboard/feira"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Captação (Feira)</a>
+                <a href="/vocacional/relatorio"><i class="fa-solid fa-compass" aria-hidden="true"></i> Teste Vocacional</a>
                 <a href="/admin/usuarios"><i class="fa-solid fa-users" aria-hidden="true"></i> Usuários</a>
                 <a href="/admin/aprovacoes"><i class="fa-solid fa-user-check" aria-hidden="true"></i> Aprovações de Cadastro</a>
                 <a href="/admin/importar-usuarios"><i class="fa-solid fa-file-import" aria-hidden="true"></i> Importar Alunos</a>

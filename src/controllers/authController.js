@@ -9,6 +9,7 @@ const jwtService = require('../services/jwtService');
 const env = require('../config/env');
 const { Usuario, Sessao, Unidade, Turma } = require('../models');
 const { encerrarSessao } = require('../middlewares/auth');
+const vocacionalService = require('../services/vocacionalService');
 
 // Avisos exibidos na tela de login após um auto-cadastro (via querystring ?aviso=)
 const AVISOS_LOGIN = {
@@ -208,7 +209,9 @@ exports.cadastrar = async (req, res, next) => {
       dadosNovo.status_cadastro = 'aprovado';
     }
 
-    await Usuario.create(dadosNovo);
+    const novo = await Usuario.create(dadosNovo);
+    // Todo visitante da feira já nasce com o teste vocacional atribuído
+    if (ehVisitante) await vocacionalService.atribuir(novo.id);
     const aviso = { aluno: 'aluno_ok', professor: 'professor_ok', visitante_feira: 'visitante_feira_ok' }[perfil];
     return res.redirect(`/login?aviso=${aviso}`);
   } catch (err) {

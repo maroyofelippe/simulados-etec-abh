@@ -18,6 +18,13 @@ const ProvaQuestao = require('./ProvaQuestao');
 const Resposta = require('./Resposta');
 const EventoFoco = require('./EventoFoco');
 const Resultado = require('./Resultado');
+const VocArea = require('./VocArea');
+const VocAfirmacao = require('./VocAfirmacao');
+const VocPerguntaAberta = require('./VocPerguntaAberta');
+const VocAplicacao = require('./VocAplicacao');
+const VocResposta = require('./VocResposta');
+const VocRespostaAberta = require('./VocRespostaAberta');
+const VocResultado = require('./VocResultado');
 
 // ---------- Unidade / Turma / Usuário ----------
 Unidade.hasMany(Turma, { foreignKey: 'unidade_id', as: 'turmas' });
@@ -83,6 +90,27 @@ EventoFoco.belongsTo(ProvaAplicada, { foreignKey: 'prova_aplicada_id', as: 'prov
 ProvaAplicada.hasOne(Resultado, { foreignKey: 'prova_aplicada_id', as: 'resultado', onDelete: 'CASCADE' });
 Resultado.belongsTo(ProvaAplicada, { foreignKey: 'prova_aplicada_id', as: 'prova' });
 
+// ---------- Teste vocacional (Feira de Profissões) ----------
+VocArea.hasMany(VocAfirmacao, { foreignKey: 'area_codigo', as: 'afirmacoes' });
+VocAfirmacao.belongsTo(VocArea, { foreignKey: 'area_codigo', as: 'area' });
+
+Usuario.hasOne(VocAplicacao, { foreignKey: 'usuario_id', as: 'vocacional' });
+VocAplicacao.belongsTo(Usuario, { foreignKey: 'usuario_id', as: 'usuario' });
+VocAplicacao.belongsTo(VocArea, { foreignKey: 'area_principal', as: 'principal' });
+VocAplicacao.belongsTo(VocArea, { foreignKey: 'area_alternativa', as: 'alternativa' });
+
+VocAplicacao.hasMany(VocResposta, { foreignKey: 'aplicacao_id', as: 'respostas', onDelete: 'CASCADE' });
+VocResposta.belongsTo(VocAplicacao, { foreignKey: 'aplicacao_id', as: 'aplicacao' });
+VocResposta.belongsTo(VocAfirmacao, { foreignKey: 'afirmacao_id', as: 'afirmacao' });
+
+VocAplicacao.hasMany(VocRespostaAberta, { foreignKey: 'aplicacao_id', as: 'respostasAbertas', onDelete: 'CASCADE' });
+VocRespostaAberta.belongsTo(VocAplicacao, { foreignKey: 'aplicacao_id', as: 'aplicacao' });
+VocRespostaAberta.belongsTo(VocPerguntaAberta, { foreignKey: 'pergunta_id', as: 'pergunta' });
+
+VocAplicacao.hasMany(VocResultado, { foreignKey: 'aplicacao_id', as: 'resultados', onDelete: 'CASCADE' });
+VocResultado.belongsTo(VocAplicacao, { foreignKey: 'aplicacao_id', as: 'aplicacao' });
+VocResultado.belongsTo(VocArea, { foreignKey: 'area_codigo', as: 'area' });
+
 module.exports = {
   sequelize,
   Unidade,
@@ -98,5 +126,12 @@ module.exports = {
   ProvaQuestao,
   Resposta,
   EventoFoco,
-  Resultado
+  Resultado,
+  VocArea,
+  VocAfirmacao,
+  VocPerguntaAberta,
+  VocAplicacao,
+  VocResposta,
+  VocRespostaAberta,
+  VocResultado
 };

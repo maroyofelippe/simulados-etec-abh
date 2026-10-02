@@ -917,3 +917,52 @@ button:focus-visible,
     font-size: 20px;
   }
 }
+/* ---------- Teste Vocacional (Feira de Profissões) ---------- */
+.voc-wrap { max-width: 720px; margin: 0 auto; }
+.voc-inicio { max-width: 720px; }
+.voc-topo { display: flex; justify-content: space-between; color: var(--texto-suave); font-size: 15px; }
+.voc-barra { height: 8px; border-radius: 99px; background: var(--borda); margin-top: 8px; overflow: hidden; }
+.voc-barra > span { display: block; height: 100%; background: var(--primaria); border-radius: 99px; transition: width .25s ease; }
+.voc-afirmacao { margin: 48px 0 0; max-width: 24ch; }
+.voc-escala { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 32px 0 0; border: 0; padding: 0; }
+.voc-opt { position: relative; }
+.voc-opt input { position: absolute; opacity: 0; inset: 0; cursor: pointer; margin: 0; }
+.voc-opt span {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-height: 76px; border: 2px solid var(--borda); border-radius: 12px; background: var(--bg-superficie);
+  font-family: var(--fonte-titulo); font-weight: 700; font-size: 26px; transition: background .15s, border-color .15s, color .15s;
+}
+.voc-opt small { font: 500 11px var(--fonte-corpo); color: var(--texto-suave); text-align: center; line-height: 1.2; }
+.voc-opt:hover span { border-color: var(--primaria); }
+.voc-opt input:focus-visible + span { outline: 3px solid var(--acento); outline-offset: 2px; }
+.voc-opt input:checked + span { background: var(--primaria); border-color: var(--primaria); color: #fff; }
+.voc-opt input:checked + span small { color: #e6f7f9; }
+.voc-extremos { display: flex; justify-content: space-between; color: var(--texto-suave); font-size: 14px; margin-top: 10px; }
+.voc-acoes { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.voc-abertas { display: grid; gap: 24px; margin-top: 24px; }
+.voc-abertas label { display: block; font-weight: 500; margin-bottom: 8px; }
+.voc-abertas textarea {
+  width: 100%; font: inherit; padding: 12px 14px; border: 2px solid var(--borda); border-radius: 10px;
+  background: var(--bg-superficie); color: var(--texto); resize: vertical;
+}
+.voc-principal { margin-top: 24px; padding: 28px; border-radius: 16px; background: var(--primaria); color: #fff; }
+.voc-principal h2 { color: #fff; margin: 6px 0 10px; }
+.voc-principal p { margin: 0; max-width: 56ch; }
+[data-tema="escuro"] .voc-principal { color: #00262c; }
+[data-tema="escuro"] .voc-principal h2 { color: #00262c; }
+.voc-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.voc-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline; }
+.voc-item span { color: var(--texto-suave); font-variant-numeric: tabular-nums; }
+.voc-medidor { grid-column: 1 / -1; height: 10px; border-radius: 99px; background: var(--borda); overflow: hidden; }
+.voc-medidor i { display: block; height: 100%; background: var(--primaria); border-radius: 99px; }
+.voc-item-top .voc-medidor i { background: var(--crayola); }
+.voc-respostas dt { font-weight: 500; margin-top: 12px; }
+.voc-respostas dd { margin: 4px 0 0; color: var(--texto-suave); white-space: pre-wrap; }
+@media (max-width: 520px) {
+  .voc-escala { gap: 6px; }
+  .voc-opt span { min-height: 64px; font-size: 22px; }
+  .voc-opt small { display: none; }
+}
+@media print {
+  .topbar, .rodape, .voc-acoes, .skip-link { display: none !important; }
+}

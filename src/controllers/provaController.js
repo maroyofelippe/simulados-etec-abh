@@ -15,6 +15,7 @@ const {
 const sorteio = require('../services/sorteioService');
 const mencaoService = require('../services/mencaoService');
 const pdfService = require('../services/pdfService');
+const vocacionalService = require('../services/vocacionalService');
 const env = require('../config/env');
 
 // GET /aluno/provas  -> lista simulados disponíveis para a turma do aluno
@@ -39,8 +40,11 @@ exports.listarDisponiveis = async (req, res, next) => {
 
     const { desempenho, ranking, radar } = await montarDesempenho(aluno);
 
+    // Visitante da feira: atalho para o teste vocacional atribuído a ele
+    const vocacional = aluno.perfil === 'visitante_feira' ? await vocacionalService.atribuir(aluno.id) : null;
+
     res.render('aluno/provas', {
-      titulo: 'Minhas Provas', simulados: disponiveis, mapa, desempenho, ranking, radar,
+      titulo: 'Minhas Provas', simulados: disponiveis, mapa, desempenho, ranking, radar, vocacional,
       containerClass: 'container-largo'
     });
   } catch (err) { next(err); }
