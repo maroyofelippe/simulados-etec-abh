@@ -59,7 +59,7 @@ CREATE TABLE usuarios (
   -- Relação do visitante com a ETEC (auto-cadastro de visitante_feira)
   relacao_etec ENUM('ex_aluno','candidato','responsavel','aluno'),
   -- Curso de interesse informado no auto-cadastro (captação ativa - feira de profissões)
-  curso_interesse ENUM('Desenvolvimento de Sistemas','Jogos Digitais','Administração','Farmácia','Biotecnologia','Marketing'),
+  curso_interesse VARCHAR(100),
   senha_hash VARCHAR(255) NOT NULL,
   perfil ENUM('aluno','professor','coordenador','visitante_feira','leitura') NOT NULL DEFAULT 'aluno',
   is_root BOOLEAN DEFAULT FALSE,

@@ -39,12 +39,7 @@ const Usuario = sequelize.define('Usuario', {
   // Relação do visitante com a ETEC
   relacao_etec: { type: DataTypes.ENUM('ex_aluno', 'candidato', 'responsavel', 'aluno') },
   // Curso de interesse (captação ativa da feira de profissões)
-  curso_interesse: {
-    type: DataTypes.ENUM(
-      'Desenvolvimento de Sistemas', 'Jogos Digitais', 'Administração',
-      'Farmácia', 'Biotecnologia', 'Marketing'
-    )
-  }
+  curso_interesse: { type: DataTypes.STRING(100) }
 }, {
   tableName: 'usuarios',
   hooks: {
