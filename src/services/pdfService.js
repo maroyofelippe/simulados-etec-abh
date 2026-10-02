@@ -105,6 +105,10 @@ function gerarVocacionalPDF(dados, res) {
   doc.moveDown(0.4).fontSize(11).fillColor(AZUL)
      .text(`Segunda opção: ${segundo.curso} (${segundo.pontos} de ${maxPorArea} pontos)`);
 
+  doc.moveDown(0.5).fontSize(10).fillColor(AZUL).text('Interesse declarado x resultado do teste', 40);
+  doc.fillColor('#000').text(r.comparacao.cursoDeclarado ? `Curso informado: ${r.comparacao.cursoDeclarado}` : '', 40, undefined, { width: 515 });
+  doc.text(r.comparacao.texto, 40, undefined, { width: 515 });
+
   if (r.perfilIndefinido) {
     doc.moveDown(0.5).fontSize(10).fillColor(VERMELHO)
        .text('Notas baixas em todas as áreas: vale uma conversa exploratória com o orientador.', { width: 515 });

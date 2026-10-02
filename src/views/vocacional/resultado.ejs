@@ -14,6 +14,13 @@
   <h3 style="margin:4px 0 0"><%= s.curso %></h3>
 </div>
 
+<% const cmp = r.comparacao; const cmpClasse = cmp.situacao === 'principal' ? 'alerta-ok' : 'alerta-aviso'; %>
+<div class="alerta <%= cmpClasse %>" role="status" style="margin-top:12px">
+  <b>Interesse declarado × resultado do teste</b><br>
+  <% if (cmp.cursoDeclarado) { %>Curso informado no cadastro: <b><%= cmp.cursoDeclarado %></b><br><% } %>
+  <%= cmp.texto %>
+</div>
+
 <% if (r.perfilIndefinido) { %>
   <div class="alerta alerta-aviso" role="status">Suas notas ficaram baixas em todas as áreas. Isso é normal: talvez você ainda não tenha se identificado com nenhuma delas. Vale uma conversa com o orientador para explorar melhor.</div>
 <% } %>

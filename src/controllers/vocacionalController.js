@@ -236,6 +236,15 @@ exports.exportarCsv = async (req, res, next) => {
     const resultados = await VocResultado.findAll();
     const pontos = new Map(resultados.map((r) => [`${r.aplicacao_id}:${r.area_codigo}`, r.pontos]));
 
+    const rotulos = { principal: 'Coincide com o 1º', alternativa: 'Coincide com o 2º', outra: 'Fora do top 2', sem_area: 'Sem área equivalente', sem_interesse: 'Sem interesse informado' };
+    const rotuloComparacao = (a) => {
+      const ranking = areas.map((ar) => ({ codigo: ar.codigo, curso: ar.nome, pontos: pontos.get(`${a.id}:${ar.codigo}`) || 0 }))
+        .sort((x, y) => (y.pontos - x.pontos) || (areas.findIndex((z) => z.codigo === x.codigo) - areas.findIndex((z) => z.codigo === y.codigo)))
+        .map((r, i) => ({ ...r, posicao: i + 1 }));
+      const c = vocService.compararInteresse(a.usuario.curso_interesse, ranking);
+      return c.posicao > 2 ? `${rotulos[c.situacao]} (${c.posicao}º)` : rotulos[c.situacao];
+    };
+
     const colunas = [
       { titulo: 'Nome', chave: 'nome' },
       { titulo: 'Telefone', chave: 'telefone' },
@@ -244,6 +253,7 @@ exports.exportarCsv = async (req, res, next) => {
       { titulo: 'Status', chave: 'status' },
       { titulo: 'Curso Principal', chave: 'principal' },
       { titulo: 'Curso Alternativo', chave: 'alternativa' },
+      { titulo: 'Interesse x Teste', chave: 'comparacao' },
       { titulo: 'Perfil Indefinido', chave: 'indefinido' },
       ...areas.map((a) => ({ titulo: `Pontos ${a.nome}`, chave: `p_${a.codigo}` })),
       { titulo: 'Concluído em', chave: 'concluidoEm' }
@@ -257,6 +267,7 @@ exports.exportarCsv = async (req, res, next) => {
         status: rotulosStatus[a.status],
         principal: a.principal ? a.principal.nome : '',
         alternativa: a.alternativa ? a.alternativa.nome : '',
+        comparacao: a.status === 'concluida' ? rotuloComparacao(a) : '',
         indefinido: a.status === 'concluida' ? (a.perfil_indefinido ? 'Sim' : 'Não') : '',
         concluidoEm: a.finalizada_em ? new Date(a.finalizada_em).toLocaleString('pt-BR') : ''
       };

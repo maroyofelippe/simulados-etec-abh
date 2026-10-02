@@ -17,6 +17,54 @@ const ESCALA = ['Discordo totalmente', 'Discordo', 'Neutro', 'Concordo', 'Concor
 const ROTULOS_GRUPO = { tec: 'Tecnologia', saude: 'Saúde e ciências', gestao: 'Gestão e pessoas', servicos: 'Comunicação, comércio e turismo' };
 const ROTULOS_STATUS = { pendente: 'Não iniciado', em_andamento: 'Em andamento', concluida: 'Concluído' };
 
+// Curso de interesse do auto-cadastro (authController.CURSOS_VISITANTE) -> área do teste.
+// Turmas de turnos diferentes do mesmo curso apontam para a mesma área.
+const AREA_POR_CURSO = {
+  'Desenvolvimento de Sistemas-M-Tec-Manhã': 'DS',
+  'Eletrônica-M-Tec-Manhã': 'ELE',
+  'Marketing-M-Tec-Manhã': 'MKT',
+  'Recursos Humanos-M-Tec-Manhã': 'RH',
+  'Programação de Jogos Digitais-M-Tec-Tarde': 'JD',
+  'Farmácia-M-Tec-Tarde': 'FAR',
+  'Biotecnologia-Tarde': 'BIO',
+  'Administração-M-Tec-Tarde': 'ADM',
+  'Informática para Internet-M-Tec-Noite': 'IPI',
+  'Farmácia-Noite': 'FAR',
+  'Administração-M-Tec-Noite': 'ADM',
+  'Eletroeletrônica-M-Tec-Noite': 'ELE',
+  'Eletrotécnica-Noite': 'ETC',
+  'Especialização em Gestão de Projetos- EAD': 'GP',
+  'Guia de Turismo-EAD': 'TUR',
+  'Comércio-EAD': 'COM',
+  'Secretariado-EAD': 'SEC',
+  'Transações Imobiliárias-EAD': 'TI'
+};
+
+// Compara o curso de interesse declarado com o ranking do teste.
+// situacao: principal | alternativa | outra (no ranking, com posição) | sem_interesse | sem_area
+function compararInteresse(cursoInteresse, ranking) {
+  if (!cursoInteresse) return { situacao: 'sem_interesse', cursoDeclarado: null };
+  const codigo = AREA_POR_CURSO[cursoInteresse];
+  const item = codigo && ranking.find((r) => r.codigo === codigo);
+  if (!item) return { situacao: 'sem_area', cursoDeclarado: cursoInteresse };
+  const situacao = item.posicao === 1 ? 'principal' : item.posicao === 2 ? 'alternativa' : 'outra';
+  return {
+    situacao, cursoDeclarado: cursoInteresse, codigo, curso: item.curso,
+    posicao: item.posicao, pontos: item.pontos, total: ranking.length
+  };
+}
+
+// Texto curto para tela, PDF e CSV
+function textoComparacao(c, maxPorArea) {
+  switch (c.situacao) {
+    case 'principal': return `Seu interesse declarado (${c.curso}) coincide com o curso de maior afinidade no teste.`;
+    case 'alternativa': return `Seu interesse declarado (${c.curso}) ficou em 2º lugar no teste (${c.pontos} de ${maxPorArea} pontos), logo atrás do curso de maior afinidade.`;
+    case 'outra': return `Seu interesse declarado (${c.curso}) ficou em ${c.posicao}º de ${c.total} no teste (${c.pontos} de ${maxPorArea} pontos). Vale conversar com o orientador sobre as áreas de maior afinidade.`;
+    case 'sem_area': return `O teste não tem uma área equivalente ao curso declarado (${c.cursoDeclarado}).`;
+    default: return 'Você não informou um curso de interesse no cadastro.';
+  }
+}
+
 // Garante que o usuário tenha o teste atribuído (chamado no auto-cadastro e,
 // por segurança, no primeiro acesso a /vocacional).
 async function atribuir(usuarioId, opcoes = {}) {
@@ -91,8 +139,12 @@ async function carregarResultado(aplicacao) {
   const respostasMapa = {};
   respostas.forEach((r) => { respostasMapa[r.afirmacao_id] = r.nota; });
 
+  const comparacao = compararInteresse(usuario && usuario.curso_interesse, ranking);
+  comparacao.texto = textoComparacao(comparacao, MAX_POR_AREA);
+
   return {
     nome: usuario ? usuario.nome : '',
+    comparacao,
     data: aplicacao.finalizada_em,
     pontuacao,
     ranking,
@@ -109,6 +161,6 @@ async function carregarResultado(aplicacao) {
 }
 
 module.exports = {
-  atribuir, embaralhar, calcular, carregarResultado,
+  atribuir, embaralhar, calcular, carregarResultado, compararInteresse, textoComparacao, AREA_POR_CURSO,
   LIMITE_BAIXO, DIF_PROXIMA, MAX_POR_AREA, ESCALA, ROTULOS_GRUPO, ROTULOS_STATUS
 };
