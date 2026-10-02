@@ -6,7 +6,8 @@
 // ==========================================================
 const { Op } = require('sequelize');
 const {
-  Unidade, Turma, Disciplina, Usuario, Simulado, ProvaAplicada, Resultado, EventoFoco, sequelize
+  Unidade, Turma, Disciplina, Usuario, Simulado, ProvaAplicada, Resultado, EventoFoco,
+  Resposta, Questao, sequelize
 } = require('../models');
 const csvService = require('../services/csvService');
 
@@ -37,6 +38,7 @@ exports.geral = async (req, res, next) => {
   try {
     const periodo = req.query.periodo || 'todos';
     const disciplinaId = req.query.disciplina_id ? parseInt(req.query.disciplina_id, 10) : null;
+    const serieAno = ['1', '2', '3'].includes(req.query.serie_ano) ? req.query.serie_ano : '';
     const whereProva = { status: 'concluida' };
     const intv = intervalo(periodo);
     if (intv) whereProva.finalizada_em = intv;
@@ -52,11 +54,72 @@ exports.geral = async (req, res, next) => {
     // Série temporal (últimos 6 meses) de média de notas
     const serie = await serieTemporalNotas(disciplinaId);
 
+    // Radar por unidade: % de aproveitamento por disciplina, somando todas as
+    // respostas de todos os simulados concluídos (inclusive os que misturam
+    // disciplinas), filtrável por ano do Ensino Médio
+    const radarUnidades = await aproveitamentoPorUnidade(unidades, whereProva, serieAno);
+
     res.render('dashboard/geral', {
-      titulo: 'Dashboard Geral', cards, serie, periodo, disciplinas, disciplinaId
+      titulo: 'Dashboard Geral', cards, serie, periodo, disciplinas, disciplinaId, serieAno, radarUnidades
     });
   } catch (err) { next(err); }
 };
+
+// Agrega, por unidade, o % de acertos por disciplina (radar). Usa a disciplina
+// de cada QUESTÃO (não a do simulado), pois simulados "banco" costumam reunir
+// questões de várias disciplinas num só simulado.
+async function aproveitamentoPorUnidade(unidades, whereProva, serieAno) {
+  const includeTurma = { model: Turma, as: 'turma', attributes: [] };
+  if (serieAno) {
+    includeTurma.where = { serie: { [Op.like]: `${serieAno}%` } };
+    includeTurma.required = true;
+  }
+
+  const respostas = await Resposta.findAll({
+    include: [
+      {
+        model: ProvaAplicada, as: 'prova', attributes: ['id'], where: whereProva, required: true,
+        include: [{
+          model: Usuario, as: 'aluno', attributes: ['unidade_id'], where: { perfil: 'aluno' }, required: true,
+          include: [includeTurma]
+        }]
+      },
+      { model: Questao, as: 'questao', attributes: ['id'], include: [{ model: Disciplina, as: 'disciplina' }] }
+    ]
+  });
+
+  const porUnidade = new Map(); // unidadeId -> Map(disciplina -> {total, acertos})
+  respostas.forEach((r) => {
+    const unidadeId = r.prova && r.prova.aluno ? r.prova.aluno.unidade_id : null;
+    const disciplina = r.questao && r.questao.disciplina ? r.questao.disciplina.nome : null;
+    if (!unidadeId || !disciplina) return;
+    if (!porUnidade.has(unidadeId)) porUnidade.set(unidadeId, new Map());
+    const porDisciplina = porUnidade.get(unidadeId);
+    if (!porDisciplina.has(disciplina)) porDisciplina.set(disciplina, { total: 0, acertos: 0 });
+    const o = porDisciplina.get(disciplina);
+    o.total += 1;
+    if (r.correta) o.acertos += 1;
+  });
+
+  // Vértices do radar = união das disciplinas com dados em qualquer unidade
+  const labels = new Set();
+  porUnidade.forEach((porDisciplina) => porDisciplina.forEach((_, nome) => labels.add(nome)));
+  const disciplinasLabels = Array.from(labels).sort();
+
+  return {
+    labels: disciplinasLabels,
+    series: unidades.map((u) => {
+      const porDisciplina = porUnidade.get(u.id) || new Map();
+      return {
+        unidade: u.nome,
+        valores: disciplinasLabels.map((nome) => {
+          const o = porDisciplina.get(nome);
+          return o && o.total ? Math.round((o.acertos / o.total) * 1000) / 10 : 0;
+        })
+      };
+    })
+  };
+}
 
 async function estatisticasUnidade(unidadeId, whereProva, disciplinaId) {
   // provas concluídas por alunos daquela unidade (visitantes da feira ficam fora deste indicador acadêmico)

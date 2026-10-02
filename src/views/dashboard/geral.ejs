@@ -14,6 +14,13 @@
           <option value="<%= d.id %>" <%= disciplinaId===d.id?'selected':'' %>><%= d.nome %></option>
         <% }); %>
       </select></div>
+    <div><label>Ano do Ensino Médio (radar)</label>
+      <select name="serie_ano" onchange="this.form.submit()">
+        <option value="">Todos</option>
+        <option value="1" <%= serieAno==='1'?'selected':'' %>>1º ano</option>
+        <option value="2" <%= serieAno==='2'?'selected':'' %>>2º ano</option>
+        <option value="3" <%= serieAno==='3'?'selected':'' %>>3º ano</option>
+      </select></div>
   </form>
 </div>
 
@@ -48,6 +55,18 @@
 </div>
 
 <div class="card" style="margin-top:16px">
+  <h3>Aproveitamento por disciplina — comparativo entre unidades</h3>
+  <p class="metric-label">
+    % de acertos por disciplina, somando todos os simulados concluídos entre as turmas<% if (serieAno) { %> do <%= serieAno %>º ano do Ensino Médio<% } %>.
+  </p>
+  <% if (!radarUnidades.labels.length) { %>
+    <p class="metric-label">Nenhum dado concluído encontrado para este filtro.</p>
+  <% } else { %>
+    <canvas id="grafRadarUnidades" height="110"></canvas>
+  <% } %>
+</div>
+
+<div class="card" style="margin-top:16px">
   <h3>Comparar turmas</h3>
   <p class="metric-label">Acesse <a href="/dashboard/comparar">a ferramenta de comparação lado a lado</a>.</p>
 </div>
@@ -78,4 +97,23 @@ function mudarTipo(tipo) {
   document.getElementById('btnBarra').classList.toggle('ativo', tipo === 'bar');
 }
 desenhar('line');
+
+const radarUnidades = <%- JSON.stringify(radarUnidades) %>;
+if (radarUnidades.labels.length) {
+  const coresUnidades = ['#B20000','#005C6D','#A0C340','#8A29E6','#FFC24C','#4C7EFF','#FF4CA2','#00C1CF'];
+  new Chart(document.getElementById('grafRadarUnidades'), {
+    type: 'radar',
+    data: {
+      labels: radarUnidades.labels,
+      datasets: radarUnidades.series.map((s, i) => ({
+        label: s.unidade,
+        data: s.valores,
+        borderColor: coresUnidades[i % coresUnidades.length],
+        backgroundColor: coresUnidades[i % coresUnidades.length] + '33',
+        pointBackgroundColor: coresUnidades[i % coresUnidades.length]
+      }))
+    },
+    options: { scales: { r: { min: 0, max: 100, ticks: { stepSize: 20 } } } }
+  });
+}
 </script>
