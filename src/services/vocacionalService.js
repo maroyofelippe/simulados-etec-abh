@@ -14,7 +14,7 @@ const DIF_PROXIMA = 1;    // diferença (pontos) considerada empate técnico
 const MAX_POR_AREA = 15;  // 3 afirmações x nota 5
 
 const ESCALA = ['Discordo totalmente', 'Discordo', 'Neutro', 'Concordo', 'Concordo totalmente'];
-const ROTULOS_GRUPO = { tec: 'Tecnologia', saude: 'Saúde e ciências', gestao: 'Gestão e pessoas' };
+const ROTULOS_GRUPO = { tec: 'Tecnologia', saude: 'Saúde e ciências', gestao: 'Gestão e pessoas', servicos: 'Comunicação, comércio e turismo' };
 const ROTULOS_STATUS = { pendente: 'Não iniciado', em_andamento: 'Em andamento', concluida: 'Concluído' };
 
 // Garante que o usuário tenha o teste atribuído (chamado no auto-cadastro e,

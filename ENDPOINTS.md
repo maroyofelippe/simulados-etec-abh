@@ -42,7 +42,7 @@ O teste é atribuído automaticamente ao visitante no auto-cadastro (`voc_aplica
 |---|---|---|---|
 | GET | `/vocacional` | 🔑 👤 visitante_feira | Tela inicial (retoma de onde parou; se concluído, vai ao resultado) |
 | POST | `/vocacional/iniciar` | 🔑 👤 visitante_feira | Embaralha as afirmações e abre o teste |
-| GET | `/vocacional/responder` | 🔑 👤 visitante_feira | Questionário (24 afirmações + 3 perguntas abertas) |
+| GET | `/vocacional/responder` | 🔑 👤 visitante_feira | Questionário (36 afirmações + 3 perguntas abertas) |
 | GET | `/vocacional/resultado` | 🔑 👤 visitante_feira | Curso principal/alternativo, ranking e grande área |
 | GET | `/vocacional/resultado/baixar?formato=json\|pdf` | 🔑 👤 visitante_feira | Download dos próprios dados |
 | GET | `/vocacional/relatorio` | 🔑 👤 coordenador/leitura | Captação: status e afinidade dos visitantes |
