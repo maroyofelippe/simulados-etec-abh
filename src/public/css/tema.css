@@ -312,6 +312,11 @@ a:hover {
   gap: 16px;
 }
 
+.desempenho-layout>*,
+.desempenho-coluna>* {
+  min-width: 0;
+}
+
 .desempenho-coluna {
   display: flex;
   flex-direction: column;
@@ -726,7 +731,7 @@ button:focus-visible,
 @media (max-width: 900px) {
 
   .desempenho-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .container-largo {
@@ -796,6 +801,14 @@ button:focus-visible,
 
   .card {
     padding: 16px;
+  }
+
+  .card-placar .metric-label {
+    white-space: normal;
+  }
+
+  .grid-2 {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .metric {
