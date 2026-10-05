@@ -1008,6 +1008,6 @@ body.login-page:has(.banner-feira) { padding-top: 84px; }
 .curso-topo h1 { color: #fff; margin: 6px 0 0; }
 [data-tema="escuro"] .curso-topo h1 { color: #00262c; }
 .curso-corpo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 24px; align-items: start; }
-.curso-descricao p { max-width: 65ch; line-height: 1.6; text-align: justify; }
+.curso-descricao p { max-width: 100ch; line-height: 1.6; text-align: justify; }
 .curso-rodape { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 @media (max-width: 800px) { .curso-corpo { grid-template-columns: 1fr; } }
