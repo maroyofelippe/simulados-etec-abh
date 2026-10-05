@@ -976,7 +976,7 @@ button:focus-visible,
 .banner-feira {
   position: fixed; top: 0; left: 0; right: 0; z-index: 50;
   overflow: hidden; background: var(--vermelho-base, #b20000); color: #fff;
-  font: 700 20px var(--fonte-titulo); padding: 12px 0;
+  font: 700 30px var(--fonte-titulo); padding: 12px 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
 }
 .banner-feira-trilho { display: flex; width: max-content; animation: banner-feira-rolar 28s linear infinite; }
@@ -988,4 +988,4 @@ button:focus-visible,
   .banner-feira-trilho span[aria-hidden] { display: none; }
   .banner-feira-trilho span { white-space: normal; padding: 0 16px; text-align: center; }
 }
-body.login-page:has(.banner-feira) { padding-top: 64px; }
+body.login-page:has(.banner-feira) { padding-top: 84px; }
