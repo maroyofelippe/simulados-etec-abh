@@ -1,0 +1,34 @@
+<nav class="curso-voltar" aria-label="Navegação da seção">
+  <a href="/cursos"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Todos os cursos</a>
+</nav>
+
+<article class="curso-pagina">
+  <header class="voc-principal curso-topo">
+    <small><%= curso.periodo %> · <%= curso.modalidade %></small>
+    <h1><%= curso.nome %></h1>
+  </header>
+
+  <div class="curso-corpo">
+    <div class="curso-imagem curso-imagem-grande">
+      <% if (curso.imagemUrl) { %>
+        <img src="<%= curso.imagemUrl %>" alt="Imagem ilustrativa do curso <%= curso.nome %>">
+      <% } else { %>
+        <span class="curso-sem-imagem"><i class="fa-regular fa-image" aria-hidden="true"></i> Imagem em breve</span>
+      <% } %>
+    </div>
+
+    <div class="card curso-descricao">
+      <h2>Sobre o curso</h2>
+      <% if (curso.descricao && curso.descricao.trim()) { %>
+        <% curso.descricao.split(/\n\s*\n/).forEach(function(par){ %><p><%= par.trim() %></p><% }); %>
+      <% } else { %>
+        <p class="metric-label">A descrição deste curso estará disponível em breve.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <footer class="curso-rodape">
+    <% if (anterior) { %><a class="btn btn-outline" href="/cursos/<%= anterior.slug %>"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> <%= anterior.nome %> (<%= anterior.periodo %>)</a><% } else { %><span></span><% } %>
+    <% if (proximo) { %><a class="btn btn-outline" href="/cursos/<%= proximo.slug %>"><%= proximo.nome %> (<%= proximo.periodo %>) <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><% } %>
+  </footer>
+</article>

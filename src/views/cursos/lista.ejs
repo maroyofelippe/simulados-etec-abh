@@ -1,0 +1,21 @@
+<section class="curso-hero">
+  <h1>Conheça os nossos cursos</h1>
+  <p>Escolha um curso para ver a descrição completa e descobrir se ele combina com você.</p>
+  <a class="btn btn-outline" href="/vocacional"><i class="fa-solid fa-compass" aria-hidden="true"></i> Fazer o Teste Vocacional</a>
+</section>
+
+<div class="grid curso-grade">
+  <% cursos.forEach(function(c){ %>
+    <a class="card curso-card" href="/cursos/<%= c.slug %>">
+      <div class="curso-imagem curso-imagem-card">
+        <% if (c.imagemUrl) { %>
+          <img src="<%= c.imagemUrl %>" alt="" loading="lazy">
+        <% } else { %>
+          <span class="curso-sem-imagem"><i class="fa-regular fa-image" aria-hidden="true"></i> Imagem em breve</span>
+        <% } %>
+      </div>
+      <h3><%= c.nome %></h3>
+      <small class="metric-label"><%= c.periodo %> · <%= c.modalidade %></small>
+    </a>
+  <% }); %>
+</div>

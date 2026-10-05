@@ -27,6 +27,7 @@
         <% if (usuario.perfil === 'aluno' || usuario.perfil === 'visitante_feira') { %>
           <a href="/aluno/provas"><i class="fa-solid fa-file-pen" aria-hidden="true"></i> Minhas Provas</a>
           <% if (usuario.perfil === 'visitante_feira') { %>
+            <a href="/cursos"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Cursos</a>
             <a href="/vocacional"><i class="fa-solid fa-compass" aria-hidden="true"></i> Teste Vocacional</a>
           <% } %>
         <% } else { %>

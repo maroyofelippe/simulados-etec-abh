@@ -989,3 +989,25 @@ button:focus-visible,
   .banner-feira-trilho span { white-space: normal; padding: 0 16px; text-align: center; }
 }
 body.login-page:has(.banner-feira) { padding-top: 84px; }
+
+/* ---- Seção CURSOS (landing pages do visitante da Feira) ---- */
+.curso-hero { text-align: center; margin: 8px 0 24px; }
+.curso-hero p { color: var(--texto-suave); margin: 0 0 16px; }
+.curso-grade { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.curso-card { display: flex; flex-direction: column; gap: 8px; color: inherit; text-decoration: none; transition: transform .15s ease, border-color .15s ease; }
+.curso-card:hover { transform: translateY(-3px); border-color: var(--primaria); }
+.curso-card h3 { margin: 4px 0 0; }
+.curso-imagem { display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 12px; background: var(--borda); }
+.curso-imagem img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.curso-imagem-card { aspect-ratio: 16 / 10; }
+.curso-imagem-grande { aspect-ratio: 4 / 3; }
+.curso-sem-imagem { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--texto-suave); font-size: 15px; }
+.curso-sem-imagem i { font-size: 36px; }
+.curso-voltar { margin-top: 8px; }
+.curso-topo { margin-top: 12px; }
+.curso-topo h1 { color: #fff; margin: 6px 0 0; }
+[data-tema="escuro"] .curso-topo h1 { color: #00262c; }
+.curso-corpo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 24px; align-items: start; }
+.curso-descricao p { max-width: 65ch; line-height: 1.6; }
+.curso-rodape { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+@media (max-width: 800px) { .curso-corpo { grid-template-columns: 1fr; } }
