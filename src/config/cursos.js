@@ -45,7 +45,27 @@ function comImagem(curso) {
   return Object.assign({}, curso, { imagemUrl: urlImagem(curso) });
 }
 
+// Destaques da descrição: cada rótulo abre um novo parágrafo, com o rótulo em negrito.
+const ROTULOS = { 'eixo tecnológico': 'Eixo Tecnológico', 'atuação': 'Atuação', 'mercado de trabalho': 'Mercado de Trabalho' };
+const RE_ROTULO = /\s*(?:-\s*)?(Eixo Tecnológico|Atuação|Mercado de Trabalho)\s*:\s*/i;
+
+// Converte o texto da descrição em parágrafos [{ rotulo|null, texto }].
+// Linhas em branco também separam parágrafos. Rótulos reconhecidos sem diferenciar maiúsculas.
+function paragrafos(descricao) {
+  const saida = [];
+  (descricao || '').split(/\n\s*\n/).forEach((bloco) => {
+    const partes = bloco.split(RE_ROTULO); // [texto, rótulo, texto, rótulo, texto, ...]
+    const intro = partes[0].trim();
+    if (intro) saida.push({ rotulo: null, texto: intro });
+    for (let i = 1; i < partes.length; i += 2) {
+      saida.push({ rotulo: ROTULOS[partes[i].toLowerCase()], texto: (partes[i + 1] || '').trim() });
+    }
+  });
+  return saida;
+}
+
 module.exports = {
+  paragrafos,
   CURSOS,
   VALORES: CURSOS.map((c) => c.valor),
   listar: () => CURSOS.map(comImagem),

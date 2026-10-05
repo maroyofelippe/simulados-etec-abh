@@ -10,5 +10,5 @@ exports.listar = (req, res) => {
 exports.detalhar = (req, res, next) => {
   const achado = cursos.buscar(req.params.slug);
   if (!achado) return next();
-  res.render('cursos/detalhe', { titulo: achado.curso.nome, ...achado });
+  res.render('cursos/detalhe', { titulo: achado.curso.nome, paragrafos: cursos.paragrafos, ...achado });
 };

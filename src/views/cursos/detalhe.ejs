@@ -20,7 +20,9 @@
     <div class="card curso-descricao">
       <h2>Sobre o curso</h2>
       <% if (curso.descricao && curso.descricao.trim()) { %>
-        <% curso.descricao.split(/\n\s*\n/).forEach(function(par){ %><p><%= par.trim() %></p><% }); %>
+        <% paragrafos(curso.descricao).forEach(function(par){ %>
+          <p><% if (par.rotulo) { %><strong><%= par.rotulo %>:</strong> <% } %><%= par.texto %></p>
+        <% }); %>
       <% } else { %>
         <p class="metric-label">A descrição deste curso estará disponível em breve.</p>
       <% } %>
