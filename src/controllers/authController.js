@@ -122,7 +122,7 @@ exports.telaCadastro = async (req, res, next) => {
 exports.cadastrar = async (req, res, next) => {
   const {
     perfil, nome, email, rm, senha, confirmar_senha, unidade_id, turma_id, codigo_convite,
-    telefone, data_nascimento, relacao_etec, curso_interesse
+    telefone, data_nascimento, cep, relacao_etec, curso_interesse
   } = req.body;
 
   const reexibir = async (erro) => {
@@ -148,14 +148,15 @@ exports.cadastrar = async (req, res, next) => {
     }
     if (perfil === 'aluno' && (!rm || !turma_id)) return reexibir('Aluno deve informar o RM e a turma.');
     if (ehVisitante) {
-      if (!telefone || !data_nascimento || !relacao_etec || !curso_interesse) {
-        return reexibir('Preencha telefone, data de nascimento, relação com a ETEC e curso de interesse.');
+      if (!telefone || !data_nascimento || !cep || !relacao_etec || !curso_interesse) {
+        return reexibir('Preencha telefone, data de nascimento, CEP, relação com a ETEC e curso de interesse.');
       }
       if (!RELACOES_VISITANTE.includes(relacao_etec)) return reexibir('Relação com a ETEC inválida.');
       if (!CURSOS_VISITANTE.includes(curso_interesse)) return reexibir('Curso de interesse inválido.');
       if (Number.isNaN(Date.parse(data_nascimento)) || new Date(data_nascimento) > new Date()) {
         return reexibir('Data de nascimento inválida.');
       }
+      if (String(cep).replace(/\D/g, '').length !== 8) return reexibir('CEP inválido. Informe os 8 dígitos.');
     }
 
     let unidade = null;
@@ -203,6 +204,7 @@ exports.cadastrar = async (req, res, next) => {
       dadosNovo.periodo = turmaFeira.periodo;
       dadosNovo.telefone = telefone.trim();
       dadosNovo.data_nascimento = data_nascimento;
+      dadosNovo.cep = String(cep).replace(/\D/g, '');
       dadosNovo.relacao_etec = relacao_etec;
       dadosNovo.curso_interesse = curso_interesse;
       dadosNovo.ativo = true;

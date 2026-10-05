@@ -56,6 +56,7 @@ CREATE TABLE usuarios (
   rm VARCHAR(30) UNIQUE,
   telefone VARCHAR(20),                -- auto-cadastro de visitante_feira
   data_nascimento DATE,                -- auto-cadastro de visitante_feira
+  cep CHAR(8),                         -- auto-cadastro de visitante_feira (somente dígitos)
   -- Relação do visitante com a ETEC (auto-cadastro de visitante_feira)
   relacao_etec ENUM('ex_aluno','candidato','responsavel','aluno'),
   -- Curso de interesse informado no auto-cadastro (captação ativa - feira de profissões)

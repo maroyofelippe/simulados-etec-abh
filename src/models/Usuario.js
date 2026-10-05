@@ -36,6 +36,8 @@ const Usuario = sequelize.define('Usuario', {
   // ---- Campos específicos do auto-cadastro de visitante_feira ----
   telefone: { type: DataTypes.STRING(20) },
   data_nascimento: { type: DataTypes.DATEONLY },
+  // CEP somente com dígitos (8)
+  cep: { type: DataTypes.STRING(8) },
   // Relação do visitante com a ETEC
   relacao_etec: { type: DataTypes.ENUM('ex_aluno', 'candidato', 'responsavel', 'aluno') },
   // Curso de interesse (captação ativa da feira de profissões)

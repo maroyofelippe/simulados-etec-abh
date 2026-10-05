@@ -65,6 +65,9 @@
           <label><i class="fa-solid fa-cake-candles"></i> Data de nascimento</label>
           <input type="date" name="data_nascimento" value="<%= dados.data_nascimento || '' %>">
 
+          <label><i class="fa-solid fa-location-dot"></i> CEP</label>
+          <input name="cep" inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000" value="<%= dados.cep || '' %>">
+
           <label><i class="fa-solid fa-people-arrows"></i> Relação com a ETEC</label>
           <select name="relacao_etec">
             <option value="">Selecione…</option>
@@ -128,6 +131,7 @@
       var confirmarSenha = document.querySelector('[name="confirmar_senha"]');
       var telefone = document.querySelector('[name="telefone"]');
       var dataNascimento = document.querySelector('[name="data_nascimento"]');
+      var cep = document.querySelector('[name="cep"]');
       var relacaoEtec = document.querySelector('[name="relacao_etec"]');
       var cursoInteresse = document.querySelector('[name="curso_interesse"]');
 
@@ -153,6 +157,7 @@
         camposVisitante.hidden = !ehVisitante;
         telefone.required = ehVisitante;
         dataNascimento.required = ehVisitante;
+        cep.required = ehVisitante;
         relacaoEtec.required = ehVisitante;
         cursoInteresse.required = ehVisitante;
 
@@ -168,6 +173,11 @@
           if (!ok && opt.selected) turma.value = '';
         });
       }
+
+      cep.addEventListener('input', function () {
+        var d = cep.value.replace(/\D/g, '').slice(0, 8);
+        cep.value = d.length > 5 ? d.slice(0, 5) + '-' + d.slice(5) : d;
+      });
 
       perfil.addEventListener('change', aplicarPerfil);
       unidade.addEventListener('change', filtrarTurmas);
