@@ -3,12 +3,12 @@ const cursos = require('../config/cursos');
 
 // GET /cursos
 exports.listar = (req, res) => {
-  res.render('cursos/lista', { titulo: 'Cursos', cursos: cursos.listar() });
+  res.render('cursos/lista', { titulo: 'Cursos', cursos: cursos.listar(), containerClass: 'container-largo' });
 };
 
 // GET /cursos/:slug
 exports.detalhar = (req, res, next) => {
   const achado = cursos.buscar(req.params.slug);
   if (!achado) return next();
-  res.render('cursos/detalhe', { titulo: achado.curso.nome, paragrafos: cursos.paragrafos, ...achado });
+  res.render('cursos/detalhe', { titulo: achado.curso.nome, paragrafos: cursos.paragrafos, containerClass: 'container-largo', ...achado });
 };
