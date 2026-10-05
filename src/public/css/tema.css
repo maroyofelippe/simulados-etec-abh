@@ -971,3 +971,21 @@ button:focus-visible,
 @media print {
   .topbar, .rodape, .voc-acoes, .skip-link { display: none !important; }
 }
+
+/* ---- Banner temporário: Feira de Profissões (letreiro passante, tela de login) ---- */
+.banner-feira {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  overflow: hidden; background: var(--vermelho-base, #b20000); color: #fff;
+  font: 700 20px var(--fonte-titulo); padding: 12px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+}
+.banner-feira-trilho { display: flex; width: max-content; animation: banner-feira-rolar 28s linear infinite; }
+.banner-feira-trilho span { white-space: nowrap; padding-right: 96px; }
+.banner-feira:hover .banner-feira-trilho { animation-play-state: paused; }
+@keyframes banner-feira-rolar { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .banner-feira-trilho { animation: none; width: auto; }
+  .banner-feira-trilho span[aria-hidden] { display: none; }
+  .banner-feira-trilho span { white-space: normal; padding: 0 16px; text-align: center; }
+}
+body.login-page:has(.banner-feira) { padding-top: 64px; }
