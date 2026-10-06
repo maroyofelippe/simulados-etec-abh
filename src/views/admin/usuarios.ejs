@@ -8,8 +8,8 @@
   </div>
 </div>
 <div class="tabela-responsiva">
-<table>
-  <thead><tr><th>Nome</th><th>Perfil</th><th>Situação</th><th>RM</th><th>Turma</th><th>Último login</th><th>Tempo logado</th><th>Online</th><th>Sessão expira em</th><th>Ações</th></tr></thead>
+<table id="tabela-usuarios">
+  <thead><tr><th data-filtro="texto">Nome</th><th data-filtro="lista">Perfil</th><th data-filtro="lista">Situação</th><th data-filtro="texto">RM</th><th data-filtro="lista">Turma</th><th data-filtro="texto">Último login</th><th data-filtro="texto">Tempo logado</th><th data-filtro="lista">Online</th><th>Sessão expira em</th><th>Ações</th></tr></thead>
   <tbody>
   <% usuarios.forEach(function(u){
        // Sessão aberta (fim IS NULL) mais recente, se houver — ver admin.listarUsuarios.
@@ -60,6 +60,51 @@
 </table>
 </div>
 <script>
+// Filtros por coluna (lado do cliente): linha extra no cabeçalho com um campo por coluna.
+// "texto" = contém (sem diferenciar maiúsculas/acentos); "lista" = valor exato entre os existentes.
+(function () {
+  const tabela = document.getElementById('tabela-usuarios');
+  const ths = Array.from(tabela.tHead.rows[0].cells);
+  const linhas = Array.from(tabela.tBodies[0].rows);
+  const norm = function (t) { return t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); };
+  const celula = function (tr, i) { return tr.cells[i].textContent.replace(/\s+/g, ' ').trim(); };
+  const filtros = [];
+  const tr = tabela.tHead.insertRow();
+  ths.forEach(function (th, i) {
+    const td = document.createElement('th');
+    tr.appendChild(td);
+    const tipo = th.dataset.filtro;
+    if (!tipo) return;
+    let campo;
+    if (tipo === 'lista') {
+      campo = document.createElement('select');
+      campo.add(new Option('Todos', ''));
+      Array.from(new Set(linhas.map(function (r) { return celula(r, i); }))).sort().forEach(function (v) { campo.add(new Option(v, v)); });
+    } else {
+      campo = document.createElement('input');
+      campo.type = 'search';
+      campo.placeholder = 'Filtrar…';
+    }
+    campo.setAttribute('aria-label', 'Filtrar por ' + th.textContent);
+    campo.style.width = '100%';
+    campo.style.minWidth = '90px';
+    campo.addEventListener('input', aplicar);
+    td.appendChild(campo);
+    filtros.push({ i: i, tipo: tipo, campo: campo });
+  });
+  function aplicar() {
+    linhas.forEach(function (r) {
+      const ok = filtros.every(function (f) {
+        const v = f.campo.value;
+        if (!v) return true;
+        const c = celula(r, f.i);
+        return f.tipo === 'lista' ? c === v : norm(c).includes(norm(v));
+      });
+      r.hidden = !ok;
+    });
+  }
+})();
+
 async function resetarSenha(id) {
   if (!confirm('Redefinir a senha deste usuário para a senha padrão institucional?')) return;
   const r = await fetch('/admin/usuarios/' + id + '/resetar-senha', { method: 'POST' });
