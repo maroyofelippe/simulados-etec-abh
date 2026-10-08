@@ -7,6 +7,8 @@ const jwtService = require('../services/jwtService');
 const env = require('../config/env');
 const { Usuario, Sessao } = require('../models');
 
+const EMAIL_ADMIN_SISTEMA = 'coordenador@etecabh.sp.gov.br';
+
 async function autenticar(req, res, next) {
   try {
     const token =
@@ -56,6 +58,11 @@ async function autenticar(req, res, next) {
     req.usuario = usuario;
     req.sessaoId = payload.sessaoId;
     res.locals.usuario = usuario;
+    // Apenas o administrador do sistema nunca é desconectado por inatividade: o layout
+    // recarrega a aplicação (tela inicial) antes do SESSION_TIMEOUT expirar.
+    if (usuario.email === EMAIL_ADMIN_SISTEMA) {
+      res.locals.keepAliveMs = Math.max(1, Math.floor(env.sessionTimeoutMin / 2)) * 60000;
+    }
     next();
   } catch (err) {
     return redirecionarOuErro(req, res, 'Sessão expirada ou inválida. Faça login novamente.');

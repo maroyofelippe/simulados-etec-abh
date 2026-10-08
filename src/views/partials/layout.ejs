@@ -65,6 +65,20 @@
   </main>
   <%- include('./footer') %>
   <script src="/js/tema.js"></script>
+  <% if (typeof keepAliveMs !== 'undefined' && keepAliveMs) { %>
+  <script>
+    // Admin do sistema: após <%= keepAliveMs / 60000 %> min sem interação, recarrega na tela
+    // inicial. A requisição renova a sessão (sliding) e evita o timeout por inatividade.
+    (function () {
+      var limite = <%= keepAliveMs %>, t;
+      function reiniciar() { clearTimeout(t); t = setTimeout(function () { location.href = '/'; }, limite); }
+      ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(function (e) {
+        document.addEventListener(e, reiniciar, { passive: true });
+      });
+      reiniciar();
+    })();
+  </script>
+  <% } %>
 
   <!-- VLibras: tradutor de Libras (Governo Federal) -->
   <div vw class="enabled">
