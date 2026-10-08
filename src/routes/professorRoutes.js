@@ -19,6 +19,7 @@ router.get('/simulados/novo', simulado.telaNovo);
 router.post('/simulados', simulado.criar);
 router.get('/simulados/:id/editar', simulado.telaEditar);
 router.post('/simulados/:id', simulado.atualizar);
+router.get('/simulados/:id/ranking', simulado.ranking);
 router.post('/simulados/:id/publicar', simulado.publicar);
 
 // Banco de questões

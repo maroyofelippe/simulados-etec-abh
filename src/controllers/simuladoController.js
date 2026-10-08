@@ -4,7 +4,7 @@
 //    qtd de questões <=20, turma, duração)
 //  - Publicar / listar
 // ==========================================================
-const { Simulado, Disciplina, Turma, Questao } = require('../models');
+const { Simulado, Disciplina, Turma, Questao, ProvaAplicada, Resultado, Resposta, Usuario } = require('../models');
 const { Op } = require('sequelize');
 
 // Turmas ativas, mais a turma já vinculada ao simulado (se houver) mesmo que tenha sido
@@ -22,7 +22,67 @@ exports.listar = async (req, res, next) => {
       include: [{ model: Disciplina, as: 'disciplina' }, { model: Turma, as: 'turma' }],
       order: [['criado_em', 'DESC']]
     });
-    res.render('professor/simulados', { titulo: 'Simulados', simulados });
+    // Média geral de cada simulado: todas as provas concluídas, de todas as turmas
+    const resultados = await ProvaAplicada.findAll({
+      where: { status: 'concluida', simulado_id: { [Op.in]: simulados.map((s) => s.id) } },
+      attributes: ['simulado_id'],
+      include: [{ model: Resultado, as: 'resultado', attributes: ['nota'], required: true }]
+    });
+    const acc = {};
+    resultados.forEach((p) => {
+      const a = acc[p.simulado_id] || (acc[p.simulado_id] = { soma: 0, n: 0 });
+      a.soma += Number(p.resultado.nota);
+      a.n += 1;
+    });
+    const medias = {};
+    Object.keys(acc).forEach((id) => { medias[id] = acc[id].soma / acc[id].n; });
+    res.render('professor/simulados', { titulo: 'Simulados', simulados, medias });
+  } catch (err) { next(err); }
+};
+
+// GET /professor/simulados/:id/ranking (JSON, usado pelo popup)
+//  Ranking dos alunos que concluíram o simulado + radar de % de acertos por disciplina.
+exports.ranking = async (req, res, next) => {
+  try {
+    const simulado = await Simulado.findByPk(req.params.id);
+    if (!simulado) return res.status(404).json({ erro: 'Simulado não encontrado.' });
+
+    const provas = await ProvaAplicada.findAll({
+      where: { simulado_id: simulado.id, status: 'concluida' },
+      include: [
+        { model: Resultado, as: 'resultado', required: true },
+        { model: Usuario, as: 'aluno', attributes: ['id', 'nome', 'rm'], include: [{ model: Turma, as: 'turma', attributes: ['nome'] }] }
+      ]
+    });
+    provas.sort((a, b) => Number(b.resultado.nota) - Number(a.resultado.nota) ||
+      (a.tempo_gasto_segundos || 0) - (b.tempo_gasto_segundos || 0));
+    const ranking = provas.map((p, i) => ({
+      posicao: i + 1,
+      nome: p.aluno ? p.aluno.nome : '—',
+      turma: p.aluno && p.aluno.turma ? p.aluno.turma.nome : '—',
+      nota: Number(p.resultado.nota),
+      acertos: p.resultado.acertos,
+      total: p.resultado.total_questoes,
+      mencao: p.resultado.mencao
+    }));
+    const media = ranking.length ? ranking.reduce((t, r) => t + r.nota, 0) / ranking.length : null;
+
+    const respostas = provas.length ? await Resposta.findAll({
+      where: { prova_aplicada_id: { [Op.in]: provas.map((p) => p.id) } },
+      include: [{ model: Questao, as: 'questao', include: [{ model: Disciplina, as: 'disciplina' }] }]
+    }) : [];
+    const porDisc = new Map();
+    respostas.forEach((r) => {
+      const nome = r.questao && r.questao.disciplina ? r.questao.disciplina.nome : 'Sem disciplina';
+      const o = porDisc.get(nome) || porDisc.set(nome, { total: 0, acertos: 0 }).get(nome);
+      o.total += 1;
+      if (r.correta) o.acertos += 1;
+    });
+    const radar = Array.from(porDisc.entries()).map(([disciplina, v]) => ({
+      disciplina, percentual: Math.round((v.acertos / v.total) * 1000) / 10
+    }));
+
+    res.json({ titulo: simulado.titulo, media, ranking, radar });
   } catch (err) { next(err); }
 };
 

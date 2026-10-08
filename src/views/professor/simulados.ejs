@@ -4,7 +4,7 @@
 </div>
 <div class="tabela-responsiva">
 <table>
-  <thead><tr><th>Título</th><th>Tipo</th><th>Disciplina</th><th>Turma</th><th>Questões</th><th>Status</th><th>Ações</th></tr></thead>
+  <thead><tr><th>Título</th><th>Tipo</th><th>Disciplina</th><th>Turma</th><th>Questões</th><th>Média geral</th><th>Status</th><th>Ações</th></tr></thead>
   <tbody>
   <% simulados.forEach(function(s){ %>
     <tr>
@@ -13,9 +13,11 @@
       <td><%= s.disciplina ? s.disciplina.nome : '—' %></td>
       <td><%= s.turma ? s.turma.nome : '—' %></td>
       <td><%= s.qtd_questoes %></td>
+      <td><%= medias[s.id] != null ? medias[s.id].toFixed(1) : '—' %></td>
       <td><span class="badge <%= s.publicado ? 'mencao-MB' : 'mencao-R' %>"><%= s.publicado ? 'Publicado' : 'Rascunho' %></span></td>
       <td style="white-space:nowrap">
         <a class="btn btn-outline" style="padding:6px 10px" href="/professor/simulados/<%= s.id %>/editar" title="Editar"><i class="fa-solid fa-pen"></i></a>
+        <button class="btn btn-outline" style="padding:6px 10px" onclick="abrirRanking(<%= s.id %>)" title="Ranking dos alunos"><i class="fa-solid fa-ranking-star"></i></button>
         <button class="btn btn-outline" style="padding:6px 10px" onclick="pub(<%= s.id %>)" title="<%= s.publicado ? 'Despublicar' : 'Publicar' %>"><i class="fa-solid <%= s.publicado ? 'fa-eye-slash' : 'fa-upload' %>"></i></button>
       </td>
     </tr>
@@ -23,7 +25,50 @@
   </tbody>
 </table>
 </div>
+<dialog id="dlg-ranking" aria-labelledby="dlg-titulo" style="width:min(900px,95vw);max-height:90vh;border:1px solid var(--borda);border-radius:10px;background:var(--bg-superficie);color:inherit;padding:20px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+    <h2 id="dlg-titulo" style="margin:0">Ranking</h2>
+    <button class="btn btn-outline" onclick="document.getElementById('dlg-ranking').close()" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <p class="metric-label" id="dlg-resumo"></p>
+  <div id="dlg-radar" style="position:relative;height:320px"><canvas id="grafRankingRadar"></canvas></div>
+  <div class="tabela-responsiva" style="margin-top:16px">
+    <table>
+      <thead><tr><th>#</th><th>Aluno</th><th>Turma</th><th>Acertos</th><th>Nota</th><th>Menção</th></tr></thead>
+      <tbody id="dlg-corpo"></tbody>
+    </table>
+  </div>
+</dialog>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
+let graficoRadar = null;
+async function abrirRanking(id){
+  const r = await fetch('/professor/simulados/'+id+'/ranking');
+  const d = await r.json(); if(!r.ok){alert(d.erro);return;}
+  document.getElementById('dlg-titulo').textContent = 'Ranking — ' + d.titulo;
+  document.getElementById('dlg-resumo').textContent = d.ranking.length
+    ? d.ranking.length + ' aluno(s) concluíram · média geral ' + d.media.toFixed(1)
+    : 'Nenhum aluno concluiu este simulado ainda.';
+  const corpo = document.getElementById('dlg-corpo');
+  corpo.innerHTML = '';
+  d.ranking.forEach(function(x){
+    const tr = corpo.insertRow();
+    [x.posicao + 'º', x.nome, x.turma, x.acertos + '/' + x.total, x.nota.toFixed(1), x.mencao].forEach(function(v){ tr.insertCell().textContent = v; });
+  });
+  if (graficoRadar) { graficoRadar.destroy(); graficoRadar = null; }
+  const areaRadar = document.getElementById('dlg-radar');
+  areaRadar.style.display = d.radar.length >= 3 ? '' : 'none';
+  document.getElementById('dlg-ranking').showModal();
+  if (d.radar.length >= 3) {
+    graficoRadar = new Chart(document.getElementById('grafRankingRadar'), {
+      type: 'radar',
+      data: { labels: d.radar.map(function(x){return x.disciplina;}),
+        datasets: [{ label: '% de acertos', data: d.radar.map(function(x){return x.percentual;}),
+          borderColor: '#B20000', backgroundColor: 'rgba(178,0,0,.2)', pointBackgroundColor: '#B20000' }] },
+      options: { maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { stepSize: 20 } } } }
+    });
+  }
+}
 async function pub(id){
   const r = await fetch('/professor/simulados/'+id+'/publicar',{method:'POST'});
   const d = await r.json(); if(!r.ok){alert(d.erro);return;} location.reload();
