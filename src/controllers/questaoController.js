@@ -6,14 +6,16 @@
 const { Questao, Alternativa, TextoApoio, Disciplina, Turma, sequelize } = require('../models');
 const { parse } = require('csv-parse/sync');
 const { ORIGENS, normalizarOrigem } = require('../config/origens');
+const { SERIES } = require('../config/series');
 
 exports.listar = async (req, res, next) => {
   try {
-    const { disciplina_id, dificuldade, origem } = req.query;
+    const { disciplina_id, dificuldade, origem, serie } = req.query;
     const where = {};
     if (disciplina_id) where.disciplina_id = disciplina_id;
     if (dificuldade) where.dificuldade = dificuldade;
     if (origem) where.origem = origem;
+    if (serie) where.serie = serie;
 
     const questoes = await Questao.findAll({
       where,
@@ -31,7 +33,7 @@ exports.listar = async (req, res, next) => {
 
     res.render('professor/questoes', {
       titulo: 'Banco de Questões', questoes, disciplinas, filtro: req.query,
-      totalQuestoes, placarDisciplinas, origens: ORIGENS
+      totalQuestoes, placarDisciplinas, origens: ORIGENS, series: SERIES
     });
   } catch (err) { next(err); }
 };
@@ -41,7 +43,7 @@ exports.telaNova = async (req, res, next) => {
     const disciplinas = await Disciplina.findAll({ order: [['nome', 'ASC']] });
     const turmas = await Turma.findAll({ where: { ativo: true }, order: [['nome', 'ASC']] });
     const textosApoio = await TextoApoio.findAll({ order: [['criado_em', 'DESC']], limit: 100 });
-    res.render('professor/questao_nova', { titulo: 'Nova Questão', origens: ORIGENS, disciplinas, turmas, textosApoio, erro: null });
+    res.render('professor/questao_nova', { titulo: 'Nova Questão', origens: ORIGENS, series: SERIES, disciplinas, turmas, textosApoio, erro: null });
   } catch (err) { next(err); }
 };
 

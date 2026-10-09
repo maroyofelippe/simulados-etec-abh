@@ -4,7 +4,7 @@
 </div>
 <div class="tabela-responsiva">
 <table>
-  <thead><tr><th>Título</th><th>Tipo</th><th>Disciplina</th><th>Origem</th><th>Turma</th><th>Questões</th><th>Média geral</th><th>Status</th><th>Ações</th></tr></thead>
+  <thead><tr><th>Título</th><th>Tipo</th><th>Disciplina</th><th>Origem</th><th>Série</th><th>Turma</th><th>Questões</th><th>Média geral</th><th>Status</th><th>Ações</th></tr></thead>
   <tbody>
   <% simulados.forEach(function(s){ %>
     <tr>
@@ -12,6 +12,7 @@
       <td><%= s.tipo === 'geral' ? 'Geral' : 'Aleatório/aluno' %></td>
       <td><%= s.disciplina ? s.disciplina.nome : '—' %></td>
       <td><%= s.origem || 'Qualquer' %></td>
+      <td><%= Array.isArray(s.series) && s.series.length ? s.series.join(', ') : (s.turma && s.turma.serie ? s.turma.serie + ' (turma)' : 'Qualquer') %></td>
       <td><%= s.turma ? s.turma.nome : '—' %></td>
       <td><%= s.qtd_questoes %></td>
       <td><%= medias[s.id] != null ? medias[s.id].toFixed(1) : '—' %></td>

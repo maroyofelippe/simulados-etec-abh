@@ -24,6 +24,11 @@
     <select name="origem"><option value="">— Qualquer origem —</option>
       <% origens.forEach(function(o){ %><option value="<%= o %>"><%= o %></option><% }); %>
     </select></div>
+  <div><label>Ano / série das questões</label>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <% series.forEach(function(s){ %><label style="font-weight:normal"><input type="checkbox" name="series" value="<%= s %>"> <%= s %></label><% }); %>
+    </div>
+    <p class="metric-label">Sem nenhuma marcada, usa a série da turma de aplicação (ou qualquer série, se não houver). Marque mais de uma para um simulado geral (ex.: 1ª, 2ª e 3ª séries).</p></div>
   <div class="grid grid-4">
     <div><label>Qtd. questões (máx 20)</label><input type="number" name="qtd_questoes" value="20" min="1" max="20"></div>
     <div><label>Fáceis</label><input type="number" name="dificuldade_facil" value="0" min="0"></div>

@@ -161,6 +161,7 @@ CREATE TABLE simulados (
   disciplina_id INT,
   tema VARCHAR(150),
   origem VARCHAR(40) NULL,
+  series JSON NULL,
   turma_id INT,
   qtd_questoes INT NOT NULL DEFAULT 20,
   distribuicao_dificuldade JSON,

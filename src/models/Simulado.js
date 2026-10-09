@@ -10,7 +10,8 @@ const Simulado = sequelize.define('Simulado', {
   tipo: { type: DataTypes.ENUM('aleatorio_aluno', 'geral'), allowNull: false },
   disciplina_id: { type: DataTypes.INTEGER },
   tema: { type: DataTypes.STRING(150) },
-  origem: { type: DataTypes.STRING(40) },              // null = qualquer origem
+  origem: { type: DataTypes.STRING(40) },
+  series: { type: DataTypes.JSON },                    // séries sorteáveis; null = série da turma / qualquer              // null = qualquer origem
   turma_id: { type: DataTypes.INTEGER },               // turma de aplicação
   qtd_questoes: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 20 },
   // Distribuição de dificuldade (JSON): {"Fácil":8,"Médio":8,"Difícil":4}

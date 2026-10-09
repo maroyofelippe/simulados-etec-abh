@@ -13,7 +13,10 @@
       </select></div>
     <div><label>Dificuldade</label>
       <select name="dificuldade"><option>Fácil</option><option selected>Médio</option><option>Difícil</option></select></div>
-    <div><label>Série</label><input name="serie" placeholder="1ª Série EM"></div>
+    <div><label>Ano / série</label>
+      <select name="serie">
+        <% series.forEach(function(s){ %><option value="<%= s %>"><%= s %></option><% }); %>
+      </select></div>
   </div>
   <label>Tema</label><input name="tema">
 

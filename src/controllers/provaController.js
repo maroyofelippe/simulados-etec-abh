@@ -8,6 +8,7 @@
 //  - Espelho da prova (view) e PDF com assinatura
 // ==========================================================
 const { Op } = require('sequelize');
+const { seriesDoSimulado } = require('../config/series');
 const {
   Simulado, ProvaAplicada, ProvaQuestao, Questao, Alternativa, TextoApoio,
   Resposta, EventoFoco, Resultado, Usuario, Turma, Unidade, Disciplina, sequelize
@@ -200,6 +201,8 @@ async function montarPoolQuestoes(simulado) {
   if (simulado.disciplina_id) where.disciplina_id = simulado.disciplina_id;
   if (simulado.tema) where.tema = simulado.tema;
   if (simulado.origem) where.origem = simulado.origem;
+  const series = seriesDoSimulado(simulado, simulado.turma_id ? await Turma.findByPk(simulado.turma_id) : null);
+  if (series) where.serie = { [Op.in]: series };
   const questoes = await Questao.findAll({ where });
   return questoes.map((q) => ({ id: q.id, dificuldade: q.dificuldade }));
 }

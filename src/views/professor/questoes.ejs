@@ -39,16 +39,21 @@
     <select name="origem"><option value="">Todas</option>
       <% origens.forEach(function(o){ %><option <%= filtro.origem===o?'selected':'' %>><%= o %></option><% }); %>
     </select></div>
+  <div><label>Ano / série</label>
+    <select name="serie"><option value="">Todos</option>
+      <% series.forEach(function(s){ %><option <%= filtro.serie===s?'selected':'' %>><%= s %></option><% }); %>
+    </select></div>
   <button class="btn btn-outline">Filtrar</button>
 </form>
 
 <div class="tabela-responsiva">
 <table>
-  <thead><tr><th>Origem</th><th>Disciplina</th><th>Tema</th><th>Dificuldade</th><th>Enunciado</th><th>Texto de apoio</th><th>Gab.</th></tr></thead>
+  <thead><tr><th>Origem</th><th>Ano</th><th>Disciplina</th><th>Tema</th><th>Dificuldade</th><th>Enunciado</th><th>Texto de apoio</th><th>Gab.</th></tr></thead>
   <tbody>
   <% questoes.forEach(function(q){ %>
     <tr>
       <td><%= q.origem %></td>
+      <td><%= q.serie || '—' %></td>
       <td><%= q.disciplina ? q.disciplina.nome : '—' %></td>
       <td><%= q.tema || '—' %></td>
       <td><%= q.dificuldade %></td>
