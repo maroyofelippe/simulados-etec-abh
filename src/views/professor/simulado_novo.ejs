@@ -20,6 +20,10 @@
       </select></div>
     <div><label>Tema (opcional)</label><input name="tema" placeholder="ex.: Interpretação de texto"></div>
   </div>
+  <div><label>Origem das questões (estilo da avaliação)</label>
+    <select name="origem"><option value="">— Qualquer origem —</option>
+      <% origens.forEach(function(o){ %><option value="<%= o %>"><%= o %></option><% }); %>
+    </select></div>
   <div class="grid grid-4">
     <div><label>Qtd. questões (máx 20)</label><input type="number" name="qtd_questoes" value="20" min="1" max="20"></div>
     <div><label>Fáceis</label><input type="number" name="dificuldade_facil" value="0" min="0"></div>

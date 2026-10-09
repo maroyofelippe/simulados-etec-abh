@@ -2,7 +2,11 @@
 <div class="card">
 <form method="POST" action="/professor/questoes">
   <label>Enunciado</label><textarea name="enunciado" rows="3" required></textarea>
-  <div class="grid grid-3">
+  <div class="grid grid-4">
+    <div><label>Origem</label>
+      <select name="origem">
+        <% origens.forEach(function(o){ %><option value="<%= o %>" <%= o === 'Professor' ? 'selected' : '' %>><%= o %></option><% }); %>
+      </select></div>
     <div><label>Disciplina</label>
       <select name="disciplina_id" required>
         <% disciplinas.forEach(function(d){ %><option value="<%= d.id %>"><%= d.nome %></option><% }); %>

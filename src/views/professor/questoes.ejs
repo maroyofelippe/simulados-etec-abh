@@ -19,7 +19,7 @@
 
 <div id="imp" class="card" style="display:none;margin-bottom:16px">
   <h3>Importar questões (CSV)</h3>
-  <p class="metric-label">Colunas: disciplina,dificuldade,tema,serie,enunciado,alt_a,alt_b,alt_c,alt_d,alt_e,gabarito,texto_apoio_titulo,texto_apoio_conteudo</p>
+  <p class="metric-label">Colunas: disciplina,dificuldade,tema,serie,origem(opcional),enunciado,alt_a,alt_b,alt_c,alt_d,alt_e,gabarito,texto_apoio_titulo,texto_apoio_conteudo</p>
   <p class="metric-label">As duas últimas colunas são opcionais (comum em Humanas). Repita o mesmo texto_apoio_titulo em várias linhas para vinculá-las ao mesmo texto de apoio.</p>
   <input type="file" id="arq" accept=".csv">
   <button class="btn btn-primario" onclick="importar()">Enviar</button>
@@ -35,15 +35,20 @@
     <select name="dificuldade"><option value="">Todas</option>
       <% ['Fácil','Médio','Difícil'].forEach(function(x){ %><option <%= filtro.dificuldade===x?'selected':'' %>><%= x %></option><% }); %>
     </select></div>
+  <div><label>Origem</label>
+    <select name="origem"><option value="">Todas</option>
+      <% origens.forEach(function(o){ %><option <%= filtro.origem===o?'selected':'' %>><%= o %></option><% }); %>
+    </select></div>
   <button class="btn btn-outline">Filtrar</button>
 </form>
 
 <div class="tabela-responsiva">
 <table>
-  <thead><tr><th>Disciplina</th><th>Tema</th><th>Dificuldade</th><th>Enunciado</th><th>Texto de apoio</th><th>Gab.</th></tr></thead>
+  <thead><tr><th>Origem</th><th>Disciplina</th><th>Tema</th><th>Dificuldade</th><th>Enunciado</th><th>Texto de apoio</th><th>Gab.</th></tr></thead>
   <tbody>
   <% questoes.forEach(function(q){ %>
     <tr>
+      <td><%= q.origem %></td>
       <td><%= q.disciplina ? q.disciplina.nome : '—' %></td>
       <td><%= q.tema || '—' %></td>
       <td><%= q.dificuldade %></td>

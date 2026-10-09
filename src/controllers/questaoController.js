@@ -5,13 +5,15 @@
 // ==========================================================
 const { Questao, Alternativa, TextoApoio, Disciplina, Turma, sequelize } = require('../models');
 const { parse } = require('csv-parse/sync');
+const { ORIGENS, normalizarOrigem } = require('../config/origens');
 
 exports.listar = async (req, res, next) => {
   try {
-    const { disciplina_id, dificuldade } = req.query;
+    const { disciplina_id, dificuldade, origem } = req.query;
     const where = {};
     if (disciplina_id) where.disciplina_id = disciplina_id;
     if (dificuldade) where.dificuldade = dificuldade;
+    if (origem) where.origem = origem;
 
     const questoes = await Questao.findAll({
       where,
@@ -29,7 +31,7 @@ exports.listar = async (req, res, next) => {
 
     res.render('professor/questoes', {
       titulo: 'Banco de Questões', questoes, disciplinas, filtro: req.query,
-      totalQuestoes, placarDisciplinas
+      totalQuestoes, placarDisciplinas, origens: ORIGENS
     });
   } catch (err) { next(err); }
 };
@@ -39,14 +41,14 @@ exports.telaNova = async (req, res, next) => {
     const disciplinas = await Disciplina.findAll({ order: [['nome', 'ASC']] });
     const turmas = await Turma.findAll({ where: { ativo: true }, order: [['nome', 'ASC']] });
     const textosApoio = await TextoApoio.findAll({ order: [['criado_em', 'DESC']], limit: 100 });
-    res.render('professor/questao_nova', { titulo: 'Nova Questão', disciplinas, turmas, textosApoio, erro: null });
+    res.render('professor/questao_nova', { titulo: 'Nova Questão', origens: ORIGENS, disciplinas, turmas, textosApoio, erro: null });
   } catch (err) { next(err); }
 };
 
 exports.criar = async (req, res, next) => {
   const t = await sequelize.transaction();
   try {
-    const { enunciado, dificuldade, tema, serie, gabarito, disciplina_id, turma_id,
+    const { enunciado, dificuldade, tema, serie, origem, gabarito, disciplina_id, turma_id,
       alt_a, alt_b, alt_c, alt_d, alt_e, texto_apoio_id, texto_apoio_titulo, texto_apoio_conteudo } = req.body;
 
     let textoApoioId = (texto_apoio_id && texto_apoio_id !== 'novo') ? parseInt(texto_apoio_id, 10) : null;
@@ -60,7 +62,7 @@ exports.criar = async (req, res, next) => {
     }
 
     const questao = await Questao.create({
-      enunciado, dificuldade, tema, serie, gabarito: (gabarito || 'A').toUpperCase(),
+      enunciado, dificuldade, tema, serie, origem: normalizarOrigem(origem), gabarito: (gabarito || 'A').toUpperCase(),
       disciplina_id, turma_id: turma_id || null, autor_id: req.usuario.id, texto_apoio_id: textoApoioId
     }, { transaction: t });
 
@@ -81,6 +83,7 @@ exports.criar = async (req, res, next) => {
 // Importação de questões via CSV
 // Colunas: disciplina,dificuldade,tema,serie,enunciado,alt_a,alt_b,alt_c,alt_d,alt_e,gabarito,
 //          texto_apoio_titulo,texto_apoio_conteudo (as duas últimas são opcionais)
+// Coluna opcional "origem" (SARESP, ENEM...); ausente/desconhecida = Professor.
 // Linhas com o mesmo texto_apoio_titulo (não vazio) são agrupadas no mesmo texto de apoio,
 // reutilizando um texto já existente no banco com o mesmo título quando houver.
 exports.importarCsv = async (req, res, next) => {
@@ -105,7 +108,7 @@ exports.importarCsv = async (req, res, next) => {
 
         const q = await Questao.create({
           enunciado: r.enunciado, dificuldade: r.dificuldade || 'Médio',
-          tema: r.tema, serie: r.serie, gabarito: (r.gabarito || 'A').toUpperCase(),
+          tema: r.tema, serie: r.serie, origem: normalizarOrigem(r.origem), gabarito: (r.gabarito || 'A').toUpperCase(),
           disciplina_id: discId, autor_id: req.usuario.id, texto_apoio_id: textoApoioId
         });
         await Alternativa.bulkCreate([

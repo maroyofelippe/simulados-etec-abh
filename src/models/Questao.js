@@ -9,6 +9,7 @@ const Questao = sequelize.define('Questao', {
   dificuldade: { type: DataTypes.ENUM('Fácil', 'Médio', 'Difícil'), allowNull: false },
   tema: { type: DataTypes.STRING(150) },               // ex.: "Interpretação de texto"
   serie: { type: DataTypes.STRING(40) },               // ex.: "1ª Série EM"
+  origem: { type: DataTypes.STRING(40), allowNull: false, defaultValue: 'Professor' }, // SARESP, ENEM, Professor...
   gabarito: { type: DataTypes.CHAR(1), allowNull: false }, // letra A..E
   disciplina_id: { type: DataTypes.INTEGER, allowNull: false },
   turma_id: { type: DataTypes.INTEGER },               // vínculo OPCIONAL a turma

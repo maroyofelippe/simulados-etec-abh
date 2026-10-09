@@ -6,6 +6,7 @@
 // ==========================================================
 const { Simulado, Disciplina, Turma, Questao, ProvaAplicada, Resultado, Resposta, Usuario } = require('../models');
 const { Op } = require('sequelize');
+const { ORIGENS } = require('../config/origens');
 
 // Turmas ativas, mais a turma já vinculada ao simulado (se houver) mesmo que tenha sido
 // inativada nesse meio tempo — para não sumir do <select> ao editar.
@@ -90,14 +91,14 @@ exports.telaNovo = async (req, res, next) => {
   try {
     const disciplinas = await Disciplina.findAll({ order: [['nome', 'ASC']] });
     const turmas = await Turma.findAll({ where: { ativo: true }, order: [['nome', 'ASC']] });
-    res.render('professor/simulado_novo', { titulo: 'Novo Simulado', disciplinas, turmas, erro: null });
+    res.render('professor/simulado_novo', { titulo: 'Novo Simulado', origens: ORIGENS, disciplinas, turmas, erro: null });
   } catch (err) { next(err); }
 };
 
 exports.criar = async (req, res, next) => {
   try {
     const {
-      titulo, tipo, disciplina_id, tema, turma_id, qtd_questoes,
+      titulo, tipo, disciplina_id, tema, origem, turma_id, qtd_questoes,
       dificuldade_facil, dificuldade_medio, dificuldade_dificil,
       duracao_minutos, max_perdas_foco
     } = req.body;
@@ -116,6 +117,7 @@ exports.criar = async (req, res, next) => {
       tipo: tipo === 'geral' ? 'geral' : 'aleatorio_aluno',
       disciplina_id: disciplina_id || null,
       tema: tema || null,
+      origem: ORIGENS.includes(origem) ? origem : null,
       turma_id: turma_id || null,
       qtd_questoes: qtd,
       distribuicao_dificuldade: distribuicao,
@@ -134,7 +136,7 @@ exports.telaEditar = async (req, res, next) => {
     if (!simulado) return res.status(404).render('erros/404', { titulo: 'Não encontrado' });
     const disciplinas = await Disciplina.findAll({ order: [['nome', 'ASC']] });
     const turmas = await turmasParaSelect(simulado.turma_id);
-    res.render('professor/simulado_editar', { titulo: 'Editar Simulado', simulado, disciplinas, turmas, erro: null });
+    res.render('professor/simulado_editar', { titulo: 'Editar Simulado', origens: ORIGENS, simulado, disciplinas, turmas, erro: null });
   } catch (err) { next(err); }
 };
 
@@ -144,7 +146,7 @@ exports.atualizar = async (req, res, next) => {
     if (!simulado) return res.status(404).render('erros/404', { titulo: 'Não encontrado' });
 
     const {
-      titulo, tipo, disciplina_id, tema, turma_id, qtd_questoes,
+      titulo, tipo, disciplina_id, tema, origem, turma_id, qtd_questoes,
       dificuldade_facil, dificuldade_medio, dificuldade_dificil,
       duracao_minutos, max_perdas_foco
     } = req.body;
@@ -162,6 +164,7 @@ exports.atualizar = async (req, res, next) => {
       tipo: tipo === 'geral' ? 'geral' : 'aleatorio_aluno',
       disciplina_id: disciplina_id || null,
       tema: tema || null,
+      origem: ORIGENS.includes(origem) ? origem : null,
       turma_id: turma_id || null,
       qtd_questoes: qtd,
       distribuicao_dificuldade: distribuicao,
@@ -181,6 +184,7 @@ exports.publicar = async (req, res, next) => {
     const where = { ativa: true };
     if (simulado.disciplina_id) where.disciplina_id = simulado.disciplina_id;
     if (simulado.tema) where.tema = simulado.tema;
+    if (simulado.origem) where.origem = simulado.origem;
     const disponiveis = await Questao.count({ where });
     if (disponiveis < simulado.qtd_questoes) {
       return res.status(422).json({

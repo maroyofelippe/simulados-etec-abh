@@ -24,6 +24,10 @@
       </select></div>
     <div><label>Tema (opcional)</label><input name="tema" value="<%= simulado.tema || '' %>" placeholder="ex.: Interpretação de texto"></div>
   </div>
+  <div><label>Origem das questões (estilo da avaliação)</label>
+    <select name="origem"><option value="">— Qualquer origem —</option>
+      <% origens.forEach(function(o){ %><option value="<%= o %>" <%= simulado.origem === o ? 'selected' : '' %>><%= o %></option><% }); %>
+    </select></div>
   <div class="grid grid-4">
     <div><label>Qtd. questões (máx 20)</label><input type="number" name="qtd_questoes" value="<%= simulado.qtd_questoes %>" min="1" max="20"></div>
     <div><label>Fáceis</label><input type="number" name="dificuldade_facil" value="<%= simulado.distribuicao_dificuldade ? (simulado.distribuicao_dificuldade['Fácil'] || 0) : 0 %>" min="0"></div>

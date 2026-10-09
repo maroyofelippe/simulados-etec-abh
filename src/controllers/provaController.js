@@ -199,6 +199,7 @@ async function montarPoolQuestoes(simulado) {
   const where = { ativa: true };
   if (simulado.disciplina_id) where.disciplina_id = simulado.disciplina_id;
   if (simulado.tema) where.tema = simulado.tema;
+  if (simulado.origem) where.origem = simulado.origem;
   const questoes = await Questao.findAll({ where });
   return questoes.map((q) => ({ id: q.id, dificuldade: q.dificuldade }));
 }
