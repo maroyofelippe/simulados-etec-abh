@@ -636,9 +636,11 @@ body.login-page::before {
   position: fixed;
   inset: 0;
   background-image: url('/img/Capa_Simulador.png');
-  background-size: 64%;
+  background-size: 74%;
   background-position: left;
   background-repeat: no-repeat;
+  margin-left: 10%;
+ 
 
   opacity: 0.4;
   z-index: -1;
