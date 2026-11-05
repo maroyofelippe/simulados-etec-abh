@@ -618,7 +618,7 @@ textarea:focus {
   position: fixed;
   top: 0;
   left: 0;
-  margin: 5%;
+  margin: 7%;
   padding: 0;
   width: 100px;
   height: auto;
@@ -639,7 +639,7 @@ body.login-page::before {
   background-size: 74%;
   background-position: left;
   background-repeat: no-repeat;
-  margin-left: 10%;
+  margin-left: 7%;
  
 
   opacity: 0.4;
